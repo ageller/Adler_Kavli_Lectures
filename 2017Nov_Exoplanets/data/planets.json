@@ -1,0 +1,12 @@
+//from Allen's Astrophysical Quantities; Note, I changed Earth's year to be exactly 1 so there isn't any confusion in the visualization. The true value is 0.99997862
+planets = [
+{"name":"Mercury",   "semi_major_axis":0.38709893,   "eccentricity":0.20563069,  "inclination":7.00487,  "longitude_of_ascending_node":48.33167,   "argument_of_periapsis":29.12478,  "period":0.24084445,  "tperi":2451149.5},
+{"name":"Venus",     "semi_major_axis":0.72333199,   "eccentricity":0.00677323,  "inclination":3.39471,  "longitude_of_ascending_node":76.68069,   "argument_of_periapsis":54.85229,  "period":0.61518257,  "tperi":2451063.5},
+{"name":"EarthMoon", "semi_major_axis":1.0000011,    "eccentricity":0.01671022,  "inclination":0.00005,  "longitude_of_ascending_node":-11.26064,  "argument_of_periapsis":114.20783, "period":1.0,  "tperi":2450817.5},
+{"name":"Mars",      "semi_major_axis":1.52366231,   "eccentricity":0.09341233,  "inclination":1.85061,  "longitude_of_ascending_node":49.57854,   "argument_of_periapsis":286.4623,  "period":1.88071105,  "tperi":2450820.5},
+{"name":"Jupiter",   "semi_major_axis":5.20336301,   "eccentricity":0.04839266,  "inclination":1.30530,  "longitude_of_ascending_node":100.55615,  "argument_of_periapsis":-85.8023,  "period":11.85652502, "tperi":2446986.5},
+{"name":"Saturn",    "semi_major_axis":9.53707032,   "eccentricity":0.05415060,  "inclination":2.48446,  "longitude_of_ascending_node":113.71504,  "argument_of_periapsis":-21.2831,  "period":29.42351935, "tperi":2442055.5},
+{"name":"Uranus",    "semi_major_axis":19.19126393,  "eccentricity":0.04716771,  "inclination":0.76986,  "longitude_of_ascending_node":74.22968,   "argument_of_periapsis":105.63456, "period":83.74740682, "tperi":2439265.5},
+{"name":"Neptune",   "semi_major_axis":30.06896348,  "eccentricity":0.00858587,  "inclination":1.76917,  "longitude_of_ascending_node":131.72169,  "argument_of_periapsis":-86.75034, "period":163.7232045, "tperi":2406499.5},
+{"name":"Pluto",     "semi_major_axis":39.48168677,  "eccentricity":0.24880766,  "inclination":17.14175, "longitude_of_ascending_node":110.30347,  "argument_of_periapsis":113.76329, "period":248.0208,    "tperi":2447774.5}
+]

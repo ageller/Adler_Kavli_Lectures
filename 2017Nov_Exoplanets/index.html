@@ -1,0 +1,72 @@
+<html>
+
+	<head>
+		<title>Adler Kavli Lecture November 2017</title>
+
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		
+<!-- three.js resources -->		
+		<script src="resources/three.min.js"></script>
+		<script src="resources/dat.gui.min.js"></script>
+		<script src="resources/Detector.js"></script>
+		<script src="resources/OrbitControls.js"></script>
+		<script src="resources/TrackballControls.js"></script>
+		<script src="resources/KeyboardState.js"></script>
+		<script src="resources/THREEx.FullScreen.js"></script>
+		<script src="resources/THREEx.WindowResize.js"></script>
+		<script src="resources/THREE.ConstantSpline.js"></script>
+		<script src="resources/THREE.MeshLine.js"></script>
+		<script src="resources/StereoEffect.js"></script>
+
+<!-- d3 -->
+	<script src="resources/d3.v4.10.2.min.js"></script>
+
+<!-- tween -->
+	<script src="resources/Tween.js"></script>
+
+<!-- loading spinner, but change this to loading bar? -->
+<!--    <script src="resources/spin.min.js"></script> -->
+
+	</head>
+
+	<body onload="WebGLStart()">
+
+    	<div id='loader' style="background-color:black; position:absolute; top:0; bottom:0; left:0; right:0;" ></div>
+
+		<div id="ContentContainer" style="position: absolute; left:0px; top:0px"></div>
+
+		<!-- shaders -->
+	    <script src="shaders/vertex.glsl.js"></script>
+	    <script src="shaders/SunVertex.glsl.js"></script>
+	    <script src="shaders/MWVertex.glsl.js"></script>
+	    <script src="shaders/HZFragment.glsl.js"></script>
+	    <script src="shaders/coronaFragment.glsl.js"></script>
+	    <script src="shaders/SunFragment.glsl.js"></script>
+	    <script src="shaders/exoplanetFragment.glsl.js"></script>
+	    <script src="shaders/MWFragment.glsl.js"></script>
+	    <script src="shaders/M83Fragment.glsl.js"></script>
+
+		<!-- the main attraction -->	    
+		<script src="js/index.js"></script>
+
+
+	</body>
+
+<!-- load the data -->
+<!--	<script src="js/startspinner.js"></script> -->
+	<script src="data/planets.json"></script>
+	<script src="data/Sunevol_b0.1.binned.json"></script>
+	<script src="data/SSevol_b0.1_Mercury.binned.json"></script>
+	<script src="data/SSevol_b0.1_Venus.binned.json"></script>
+	<script src="data/SSevol_b0.1_Earth.binned.json"></script>
+	<script src="data/SSevol_b0.1_Mars.binned.json"></script>
+	<script src="data/SSevol_b0.1_Jupiter.binned.json"></script>
+	<script src="data/SSevol_b0.1_Saturn.binned.json"></script>
+	<script src="data/SSevol_b0.1_Uranus.binned.json"></script>
+	<script src="data/SSevol_b0.1_Neptune.binned.json"></script>
+	<script src="data/SSevol_b0.1_Pluto.binned.json"></script>
+	<script src="data/HZevol_b0.1.binned.json"></script>
+	<script src="data/OpenExoplanetCatalog_Nov2017.json"></script>
+
+
+</html>
