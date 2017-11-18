@@ -22,11 +22,13 @@ var MilkyWayMesh = [];
 var M83mesh;
 var MWInnerMesh;
 var exoplanetsMesh = [];
+var exoplanetsMatrix = [];
 var exopSize0 =0.5;
 var exoplanetMaxSize0 = 0.1;
 var exoplanetMinSize0 = 0.005;
 var exopDfac = 100.; //distance from camera when we should start fading out exoplanets without known distance
 var uExoplanets;
+var redoExoplanetsTween = false;
 
 var SSrotation = new THREE.Vector3(THREE.Math.degToRad(63.), 0., -Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
 
@@ -67,12 +69,19 @@ var SolarSystemInTweening = false;
 var SSAlphaTween;
 var SSAlphaTweenValue;
 
+var MWTarget = new THREE.Vector3(0, 0, 5e9);
+var SSTarget = new THREE.Vector3(5.265142493522873, -66.50796619594568, 35.073211063757014);
+var KeplerTarget = new THREE.Vector3(-0.4353924795879783,-1.8888682349737307,-0.4925547478458271);
+var KeplerFlyTarget1 = new THREE.Vector3(-214968720.69758728, -932601301.1355674, -243191770.28334737);
+var KeplerFlyTarget2 = new THREE.Vector3(148173166.3244664, 525173139.3285601, 129715090.18351127);
 var MilkyWayViewTween;
 var SolarSystemViewTween;
 var KeplerViewTween;
+var exoplanetViewTween;
 var exoplanetViewTweenOut;
 var exoplanetViewTweenIn;
 var exoplanetTarget;
+var KeplerFlyThroughTween;
 
 function init() {
 	// scene
@@ -232,8 +241,6 @@ function defineParams(){
   		this.ShowHideSolarSystem = function() {
     		getController(SSGUI, params, "ShowHideSolarSystem").disabled = true;
        		if (!SolarSystemInTweening){
-				SolarSystemON = !SolarSystemON;
-				SolarSystemInTweening = true;
 				SSAlphaTween.start();
 			}
 		};
@@ -245,15 +252,13 @@ function defineParams(){
        	this.exoplanetMinSize = exoplanetMinSize0;
 		this.exoplanetMaxSize = exoplanetMaxSize0;
 		this.exopAlpha = 1.;
-        this.exopColorMode = 1;
+        this.exopColorMode = 2;
         this.exopMarkerMode = 1;
         this.timeYrs = 2017;
         this.exopOrbitTimeYrs = 2017;
   		this.ShowHideExoplanets = function() {
     		getController(exopGUI, params, "ShowHideExoplanets").disabled = true;
         	if (!exoplanetsInTweening){
-				exoplanetsON = !exoplanetsON;
-				exoplanetsInTweening = true;
 				exopAlphaTween.start();
 			}
 		};
@@ -263,10 +268,12 @@ function defineParams(){
 
 //tours
 		this.MilkyWayView = function() {
+			if (redoExoplanetsTween) params.ShowHideExoplanets();
 			controls.enabled = false;
 			MilkyWayViewTween.start();
 		}
 		this.SolarSystemView = function() {
+			if (redoExoplanetsTween) params.ShowHideExoplanets();
 			controls.enabled = false;
 			SolarSystemViewTween.start();
 			if (!SolarSystemON){
@@ -274,14 +281,52 @@ function defineParams(){
 			}
 		}
 		this.KeplerView = function() {
+			if (redoExoplanetsTween || !exoplanetsON) params.ShowHideExoplanets();
 			controls.enabled = false;
 			KeplerViewTween.start();
 		}
-		this.exoplanetView = function() {
+		this.KeplerFlyThrough = function(){
+			if (redoExoplanetsTween || !exoplanetsON) params.ShowHideExoplanets();
 			controls.enabled = false;
-			exoplanetViewTweenOut.start();
-			if (!exoplanetsON){
-				params.ShowHideExoplanets()
+			if (camera.position.distanceTo(KeplerTarget) > 1){
+				KeplerFlyThroughTween.start();
+			}else{
+				KeplerFlyThroughTween1.start();
+			}
+		}
+
+		this.GoToExoplanet = "";
+		this.GoToExoplanetTween = function() {
+			if (redoExoplanetsTween || !exoplanetsON) params.ShowHideExoplanets();
+
+			if (params.GoToExoplanet != ""){
+
+				var i = uExoplanets.name.indexOf(params.GoToExoplanet);
+				var pos = uExoplanets.position[i];
+
+				var imesh = exoplanets.name.indexOf(params.GoToExoplanet);
+				//https://github.com/mrdoob/three.js/issues/1606
+				var matrix = exoplanetsMatrix[imesh].clone();
+
+				//scale the matrix
+				var r = pos.distanceTo(new THREE.Vector3(0., 0., 0.));
+				var val = Math.max(0.025*r, 5.e5 )
+				matrix.elements[15] *= r/val;
+
+				var c0 = new THREE.Vector3(0., 0., -1.).applyMatrix4( matrix );
+				var exoplanetTarget = new THREE.Vector3(pos.x + c0.x, pos.y + c0.y, pos.z + c0.z);
+				var r1 = exoplanetTarget.distanceTo(new THREE.Vector3(0., 0., 0.));
+				if (r1 < r){
+					//console.log("swapping")
+					exoplanetTarget = new THREE.Vector3(pos.x - c0.x, pos.y - c0.y, pos.z - c0.z);
+				}
+
+				//console.log(pos, exoplanetTarget, c0, r, r1, val, matrix)
+				exoplanetViewTween.to(exoplanetTarget, 3500);
+				exoplanetViewTween.start();
+				exoplanetsMesh[imesh].material.uniforms.exopAlpha.value = 1.;
+
+
 			}
 		}
 
@@ -315,7 +360,7 @@ function defineParams(){
 				exopAlphaTween.to({"value":0});
 			}
 
-			if (params.showExoplanets){
+			if (exoplanetsON){
 				params.exoplanetMinSize = exoplanetMinSize0*params.exopSize/exopSize0;
 				params.exoplanetMaxSize = exoplanetMaxSize0*params.exopSize/exopSize0;
 
@@ -390,7 +435,17 @@ function defineParams(){
 	toursGUI.add( params, 'MilkyWayView');
 	toursGUI.add( params, 'SolarSystemView');
 	toursGUI.add( params, 'KeplerView');
-	toursGUI.add( params, 'exoplanetView');
+	toursGUI.add( params, 'KeplerFlyThrough');
+	var exopSelect = {"Select":""}
+	uExoplanets.name.forEach(function(e){
+		var i = exoplanets.name.indexOf(e);
+		ringTot = parseInt(Math.floor(Math.abs(exoplanets.ringInfo[i])));
+		var hab = Math.sign(exoplanets.yrDiscovered[i])
+		//if (exoplanets.ringInfo[i] > 0 && ringTot > 3) exopSelect[e] = e;
+		if (exoplanets.ringInfo[i] > 0 && hab == -1) exopSelect[e] = e;
+
+	});
+	toursGUI.add( params, 'GoToExoplanet',exopSelect ).onChange( params.GoToExoplanetTween );
 
 	cameraGUI.add( params, 'fullscreen');
 	cameraGUI.add( params, 'stereo').onChange(params.updateStereo);
@@ -415,8 +470,8 @@ function defineParams(){
 	exopGUI.add( params, 'timeStepFac', 0, 100 ).onChange( params.updateExoplanets );
 	exopGUI.add( params, 'exopSize',0.01, 2. ).onChange( params.updateExoplanets );
 	exopGUI.add( params, 'exopAlpha',0., 1. ).onChange( params.updateExoplanets );
-	exopGUI.add( params, 'exopColorMode',{ DiscoveryMethod: 1, PlanetSize: 2, HabitableZone: 3 } ).onChange( params.updateExoplanets );
-	exopGUI.add( params, 'exopMarkerMode',{ BullsEye: 1, Orrery: 2} ).onChange( params.updateExoplanets );
+	exopGUI.add( params, 'exopColorMode',{ "DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3 } ).onChange( params.updateExoplanets );
+	exopGUI.add( params, 'exopMarkerMode',{ "BullsEye": 1, "Orrery": 2} ).onChange( params.updateExoplanets );
 
 	MWGUI.add( params, 'MWalpha',0., 1. ).onChange( params.updateMW );
 
@@ -426,22 +481,32 @@ function defineTweens(){
 
 	//for easing the alpha on the exoplanets to turn them off
 	exopAlphaTweenValue = {"value":params.exopAlpha};
-	exopAlphaTween = new TWEEN.Tween(exopAlphaTweenValue).to({"value":0}, 1000);
+	exopAlphaTween = new TWEEN.Tween(exopAlphaTweenValue).to({"value":0.}, 1000);
+	exopAlphaTween.onStart(function() {
+		exoplanetsON = !exoplanetsON;
+		exoplanetsInTweening = true;
+	});
 	exopAlphaTween.onUpdate(function(object){
 		exoplanetsMesh.forEach( function( e, i ) {
-			e.material.uniforms.exopAlpha.value = object.value;
-			if (Math.sign(exoplanets.ringInfo[i]) < 0){
-				e.material.uniforms.exopAlpha.value = Math.min(params.exopAlpha, exopDfac/camDist) * object.value;
-			}
+			if ((exoplanets.name[i] != params.GoToExoplanet) || redoExoplanetsTween){
+				e.material.uniforms.exopAlpha.value = object.value;
+				if (Math.sign(exoplanets.ringInfo[i]) < 0){
+					e.material.uniforms.exopAlpha.value = Math.min(params.exopAlpha, exopDfac/camDist) * object.value;
+				}
+			} 
 		});
 	});
 	exopAlphaTween.onComplete(function(object){
 		exoplanetsInTweening = false;
+		redoExoplanetsTween = false;
 		getController(exopGUI, params, "ShowHideExoplanets").disabled = false;
-		if (object.value == 0){
-			this.to({"value":params.exopAlpha})
+		if (exoplanetsON){
+			this.to({"value":0.})
 		} else {
-			this.to({"value":0});
+			this.to({"value":params.exopAlpha});
+			if (object.value != 0){
+				redoExoplanetsTween = true;
+			}
 		}
 	});
 
@@ -449,6 +514,10 @@ function defineTweens(){
 	//for easing the alpah on the Solar System to turn them off
 	SSAlphaTweenValue = {"value":params.SSalpha};
 	SSAlphaTween = new TWEEN.Tween(SSAlphaTweenValue).to({"value":0}, 1000);
+	SSAlphaTween.onStart(function(){
+		SolarSystemON = !SolarSystemON;
+		SolarSystemInTweening = true;
+	});
 	SSAlphaTween.onUpdate(function(object){
 		orbitLines.forEach( function( l, i ) {
 			l.material.uniforms.opacity.value = object.value;
@@ -461,31 +530,28 @@ function defineTweens(){
 	SSAlphaTween.onComplete(function(object){
 		SolarSystemInTweening = false;
 		getController(SSGUI, params, "ShowHideSolarSystem").disabled = false;
-
-		if (object.value == 0){
-			this.to({"value":params.SSalpha})
+		if (SolarSystemON){
+			this.to({"value":0.})
 		} else {
-			this.to({"value":0});
+			this.to({"value":params.SSalpha});
 		}
 	});
 
 
 	//for moving position out to the MW
-	var MWTarget = new THREE.Vector3(0, 0, 5e9);
+	
 	MilkyWayViewTween = new TWEEN.Tween(camera.position).to(MWTarget, 5000).easing(TWEEN.Easing.Quintic.InOut);
 	MilkyWayViewTween.onComplete(function(object){
 		controls.enabled = true;
 	});
 
 	//for moving to Solar System View
-	var SSTarget = new THREE.Vector3(5.265142493522873, -66.50796619594568, 35.073211063757014);
 	SolarSystemViewTween = new TWEEN.Tween(camera.position).to(SSTarget, 5000).easing(TWEEN.Easing.Quintic.InOut);
 	SolarSystemViewTween.onComplete(function(object){
 		controls.enabled = true;
 	});
 
 	//for moving to a view of the Kepler field
-	var KeplerTarget = new THREE.Vector3(-0.4353924795879783,-1.8888682349737307,-0.4925547478458271);
 	KeplerViewTween = new TWEEN.Tween(camera.position).to(KeplerTarget, 5000).easing(TWEEN.Easing.Quintic.InOut);
 	KeplerViewTween.onComplete(function(object){
 		controls.enabled = true;
@@ -497,27 +563,48 @@ function defineTweens(){
 		}
 	});
 
-	var i = uExoplanets.name.indexOf("TRAPPIST-1")
-	var pos = uExoplanets.position[i];
-	var exoplanetTarget1 = new THREE.Vector3(pos.x, pos.y, pos.z);
-	exoplanetTarget1.z *= 2.;
-	var exoplanetTarget = new THREE.Vector3(pos.x, pos.y, pos.z);
-	console.log(exoplanetTarget1, exoplanetTarget)
-	exoplanetViewTweenOut = new TWEEN.Tween(camera.position).to(exoplanetTarget1, 2500).easing(TWEEN.Easing.Quintic.In);
-	exoplanetViewTweenOut.onComplete(function(object){
-		//var a = new THREE.Euler( camera.rotation.x, camera.rotation.y, camera.rotation.z, 'XYZ' );
-		//var c0 = new THREE.Vector3(0., 0., -0.001*camera.position.z);
-		//c0.applyEuler(a);
-		//exoplanetTarget.x += c0.x;	
-		//exoplanetTarget.y += c0.y;	
-		//exoplanetTarget.z += c0.z;	
-		//foo = new TWEEN.Tween(camera.position).to(target, 1000).start();
-	});	
-	exoplanetViewTweenIn = new TWEEN.Tween(camera.position).to(exoplanetTarget, 2500).easing(TWEEN.Easing.Quintic.Out);
-	exoplanetViewTweenIn.onComplete(function(object){
+
+	//dummy values will be reset in params
+	var exoplanetTarget = new THREE.Vector3(0,0,0);
+	exoplanetViewTween = new TWEEN.Tween(camera.position).to(exoplanetTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);	
+	exoplanetViewTween.onComplete(function(object){
 		controls.enabled = true;
+		exopAlphaTween.to({"value":0.2*params.exopAlpha}).start();
 	});
-	exoplanetViewTweenOut.chain(exoplanetViewTweenIn)
+
+	KeplerFlyThroughTween = new TWEEN.Tween(camera.position).to(KeplerTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);
+	KeplerFlyThroughTween1 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget1, 5000).easing(TWEEN.Easing.Quintic.InOut);
+	KeplerFlyThroughTween1.onComplete(function(object){
+		
+		var foo = 0;
+		var Nrot = 50;
+		var myRotate = setInterval(function(){
+			var x = camera.position.x;
+			var y = camera.position.y;
+			var z = camera.position.z;
+			var rotSpeed = 0.75 * Math.PI/Nrot;
+			camera.position.x = x * Math.cos(rotSpeed) - z * Math.sin(rotSpeed);
+			camera.position.z = z * Math.cos(rotSpeed) + x * Math.sin(rotSpeed);
+	  		camera.lookAt(scene.position);
+	  		foo += 1;
+	  		if (foo > Nrot){
+	  			clearInterval(myRotate);
+				KeplerFlyThroughTween2.start()
+	  		}
+	  	}, 1);
+	  	
+
+	});
+	KeplerFlyThroughTween2 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget2, 3000).easing(TWEEN.Easing.Quadratic.Out);
+	KeplerFlyThroughTween3 = new TWEEN.Tween(camera.position).to(KeplerTarget, 20000).easing(TWEEN.Easing.Quintic.Out);
+	KeplerFlyThroughTween3.onComplete(function(object){
+		controls.enabled = true;
+		if (SolarSystemON){
+			params.ShowHideSolarSystem()
+		}
+	});
+	KeplerFlyThroughTween.chain(KeplerFlyThroughTween1);//.chain(KeplerFlyThroughTween2); //I think you can only chain two together
+	KeplerFlyThroughTween2.chain(KeplerFlyThroughTween3);
 }
 
 function WebGLStart(){

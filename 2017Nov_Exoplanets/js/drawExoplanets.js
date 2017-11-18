@@ -78,8 +78,11 @@ function drawExoplanets()
 		mesh.lookAt( camera.position )
 		scene.add(mesh);
 
+
 		//console.log(mesh.position)
 		exoplanetsMesh.push(mesh);
 
+		//save the initial matrices for Tweening later
+		exoplanetsMatrix.push(mesh.matrix);
 	}
 }

@@ -13,7 +13,7 @@
 //fly to individual exoplanets and show their names
 //improve the Galaxy -- and how it matches to the image
 //loading screen (including waiting for textures to load)
-
+//fog for exoplanets?
 
 function animate(time) {
 	requestAnimationFrame( animate );
@@ -24,9 +24,10 @@ function animate(time) {
 }
 
 function update(time){
-	if ( keyboard.pressed("z") ) 
+	keyboard.update();
+	if ( keyboard.down("C") ) 
 	{	  
-		// do something
+		console.log(camera.position, camera.rotation)
 	}
 	
 	controls.update();
@@ -92,39 +93,42 @@ function render() {
 
 	}
 
+
 	//I want to set a minimum and maximum size for the exoplanets
 	if (exoplanetsON && !exoplanetsInTweening){
 		exoplanetsMesh.forEach( function(l, i){
-			dist = l.position.distanceTo(camera.position);
-			vFOV = THREE.Math.degToRad( camera.fov ); // convert vertical fov to radians
-			height = 2 * Math.tan( vFOV / 2 ) * dist; // visible height
-			width = height * camera.aspect; 
-			if (l.material.uniforms.size.value/width < params.exoplanetMinSize){
-				l.scale.x = params.exoplanetMinSize * width / l.material.uniforms.size.value;
-				l.scale.y = params.exoplanetMinSize * width / l.material.uniforms.size.value;
-				//l.material.uniforms.size.value = exoplanetMinSize * width;
+			if (exoplanets.name[i] != params.GoToExoplanet){
+				dist = l.position.distanceTo(camera.position);
+				vFOV = THREE.Math.degToRad( camera.fov ); // convert vertical fov to radians
+				height = 2 * Math.tan( vFOV / 2 ) * dist; // visible height
+				width = height * camera.aspect; 
+				if (l.material.uniforms.size.value/width < params.exoplanetMinSize){
+					l.scale.x = params.exoplanetMinSize * width / l.material.uniforms.size.value;
+					l.scale.y = params.exoplanetMinSize * width / l.material.uniforms.size.value;
+					//l.material.uniforms.size.value = exoplanetMinSize * width;
 
-			} 	
-			if (l.material.uniforms.size.value/width > params.exoplanetMaxSize){
-				l.scale.x = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
-				l.scale.y = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
-				//l.material.uniforms.size.value = exoplanetMinSize * width;
-			} 	
-			//also if we pull far enough away from the Sun, fade out planets without known distances
-			//if there is no distance known, the ringInfo will be negative
-			if (Math.sign(exoplanets.ringInfo[i]) < 0){
-				l.material.uniforms.exopAlpha.value = Math.min(params.exopAlpha, exopDfac/camDist);
+				} 	
+				if (l.material.uniforms.size.value/width > params.exoplanetMaxSize){
+					l.scale.x = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
+					l.scale.y = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
+					//l.material.uniforms.size.value = exoplanetMinSize * width;
+				} 	
+				//also if we pull far enough away from the Sun, fade out planets without known distances
+				//if there is no distance known, the ringInfo will be negative
+				if (Math.sign(exoplanets.ringInfo[i]) < 0){
+					l.material.uniforms.exopAlpha.value = Math.min(params.exopAlpha, exopDfac/camDist);
+				}
+
+				//if (i == 0){
+				//	console.log(dist, width, l.material.uniforms.size.value/width)
+				//}
+				//l.scale.x =  escalefac;
+				//l.scale.y =  escalefac;
 			}
-
-
-			//if (i == 0){
-			//	console.log(dist, width, l.material.uniforms.size.value/width)
-			//}
-			//l.scale.x =  escalefac;
-			//l.scale.y =  escalefac;
 		});
 	}
 
+	
 	var MWDfac = 1.e9; //distance from camera when we should start fading in/out Milky Way
 	var MWalpha = Math.min(params.MWalpha, Math.max(0., (1. - MWDfac/camDist)));
 	MilkyWayMesh.forEach( function( m, i ) {

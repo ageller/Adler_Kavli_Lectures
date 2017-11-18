@@ -1,7 +1,8 @@
 
-function CameraDistance(origin = {"x":0, "y":0, "z":0}){
-	return Math.sqrt( Math.pow(camera.position.x - origin.x , 2.) + Math.pow(camera.position.y - origin.y, 2.) + Math.pow(camera.position.z - origin.z, 2.));
+function CameraDistance(origin = new THREE.Vector3(0., 0., 0.)){
+	return camera.position.distanceTo(origin);
 }
+
 
 
 //check if the data is loaded
