@@ -46,7 +46,7 @@ function drawExoplanets()
 
 		planetAngle = -999.
 		if (exoplanets.period[i] > 0){
-			planetAngle = 2.*Math.PI * ( (params.timeYrs * 365.2422)/exoplanets.period[i] % 1.)
+			planetAngle = 2.*Math.PI * ( (params.futureMillionYrs * 1.e6 * 365.2422)/exoplanets.period[i] % 1.)
 		}
 		var exopMaterial =  new THREE.ShaderMaterial( {
 			uniforms: {

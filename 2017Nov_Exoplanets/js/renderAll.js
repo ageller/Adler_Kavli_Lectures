@@ -10,10 +10,10 @@
 //can I use the alphaMap for the exoplanets (rather than taper)? Fix how it plots on top of HZ
 //can I shrink the size of the textures?
 //add credits for the textures
-//fly to individual exoplanets and show their names
 //improve the Galaxy -- and how it matches to the image
 //loading screen (including waiting for textures to load)
 //fog for exoplanets?
+//fix on/off for Galaxy and exoplanets with Myr timescales
 
 function animate(time) {
 	requestAnimationFrame( animate );
@@ -49,25 +49,23 @@ function render() {
 
 	//for updating the exoplanets
 	params.timeStep = parseFloat(params.timeStepUnit)*parseFloat(params.timeStepFac);
-	params.timeYrs = parseFloat(params.timeYrs);
+	params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs)*1.e6, 2017);
 	if (params.timeStep > 0){
-		params.timeYrs += params.timeStep;
-		params.timeYrs = Math.min(params.timeYrs, 2017.);
-		params.exopOrbitTimeYrs += params.timeStep;
-		params.updateExoplanets();
+		params.pastYrs += params.timeStep;
+		params.pastYrs = Math.min(params.pastYrs, 2017.);
+		params.futureMillionYrs += (params.timeStep/1.e6);
+		params.futureMillionYrs = Math.min(params.futureMillionYrs, maxTime)
+		params.updateSSExop();
+	}
+	if (params.timeStep < 0){ //equal mass loss steps
+		params.iEvol = THREE.Math.clamp(parseFloat(SuniEvol) + parseFloat(params.timeStepFac), 0, iLength-1);
+		params.futureMillionYrs = SunEvol.timeInterp.evaluate(params.iEvol);
+		params.futureMillionYrs = Math.min(params.futureMillionYrs, maxTime);
+		params.updateSSExop();
+
 	}
 
 
-	//for updating the solar system (will need to improve this)
-	params.autoUpdateSS = false;
-	if (params.diEvol >0 && params.iEvol < (iLength-1)){
-		params.autoUpdateSS = true;
-	} 
-
-	if (params.autoUpdateSS){
-		params.updateSolarSystem();
-		
-	}
 
 	//update the thickness of the orbit lines based on the camera position
 	//orbitLines.forEach( function( l, i ) {
@@ -97,7 +95,8 @@ function render() {
 	//I want to set a minimum and maximum size for the exoplanets
 	if (exoplanetsON && !exoplanetsInTweening){
 		exoplanetsMesh.forEach( function(l, i){
-			if (exoplanets.name[i] != params.GoToExoplanet){
+			if (exoplanets.name[i] != params.GoToExoplanet && Math.abs(exoplanets.yrDiscovered[i]) <= params.pastYrs){
+		
 				dist = l.position.distanceTo(camera.position);
 				vFOV = THREE.Math.degToRad( camera.fov ); // convert vertical fov to radians
 				height = 2 * Math.tan( vFOV / 2 ) * dist; // visible height
@@ -128,13 +127,13 @@ function render() {
 		});
 	}
 
-	
-	var MWDfac = 1.e9; //distance from camera when we should start fading in/out Milky Way
-	var MWalpha = Math.min(params.MWalpha, Math.max(0., (1. - MWDfac/camDist)));
-	MilkyWayMesh.forEach( function( m, i ) {
-		m.material.uniforms.MWalpha.value = MWalpha;
-	});	
-	MWInnerMesh.material.opacity = Math.min(params.MWalpha, Math.max(0., 0.5*MWDfac/camDist));;
+	if (MilkyWayON && !MWInTweening){
+		var MWalpha = Math.min(params.MWalpha, Math.max(0., (1. - MWDfac/camDist)));
+		MilkyWayMesh.forEach( function( m, i ) {
+			m.material.uniforms.MWalpha.value = MWalpha;
+		});	
+		MWInnerMesh.material.opacity = Math.min(params.MWalpha, Math.max(0., 0.5*MWDfac/camDist));
+	}
 
 	//render the scene (with the Milky Way always in the back)
 	if (params.renderer != effect) params.renderer.clear();
@@ -144,13 +143,6 @@ function render() {
 	params.renderer.render( scene, camera );
 
 
-	//for updating the solar system (will need to improve this)
-	if (params.iEvol+params.diEvol < iLength){
-		params.iEvol += params.diEvol;
-	} else {
-		params.iEvol = iLength - 1;
-		params.autoUpdateSS = false;
-	}
 
 
 }

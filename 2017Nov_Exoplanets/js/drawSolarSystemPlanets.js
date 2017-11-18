@@ -1,23 +1,3 @@
-//not working
-function updateOrbitLines() {
-
-	orbitLines.forEach( function( l, i ) {
-		if (planetsEvol[planets[i].name + "Evol"].semi_major_axis.length > params.iEvol){
-			geo = createOrbit(planetsEvol[planets[i].name + "Evol"].semi_major_axis[params.iEvol], planets[i].eccentricity, THREE.Math.degToRad(planets[i].inclination), THREE.Math.degToRad(planets[i].longitude_of_ascending_node), THREE.Math.degToRad(planets[i].argument_of_periapsis), Ntheta = 100.);
-			var g = new MeshLine();
-			g.setGeometry( geo );
-			l.geometry.verticesNeedUpdate = true;
-			if (i == 2)console.log(planets[i].name, geo)
-
-		} else {
-			//will this allow me to add them back in on restart?
-			l.geometry.dispose();
-			scene.remove( l );
-		}
-	} );
-	
-
-}
 
 function clearOrbitLines() {
 	orbitLines.forEach( function( l, i ) {
@@ -27,10 +7,11 @@ function clearOrbitLines() {
 	orbitLines = [];
 }
 
+
 function createOrbit(semi, ecc, inc, lan, ap, tperi, period, Ntheta = 10.){
 //in this calculation the orbit line will start at peri
 //but I'd like to move that so that it starts at roughly the correct spot for the given planet at the given time
-	var JDtoday = JD0 + (params.exopOrbitTimeYrs - 1990.)
+	var JDtoday = JD0 + (params.pastYrs + params.futureMillionYrs*1.e6 - 1990.)
 	var tdiff = JDtoday - tperi;
 	var phase = (tdiff % period)/period; 
 
@@ -76,7 +57,11 @@ function createOrbit(semi, ecc, inc, lan, ap, tperi, period, Ntheta = 10.){
 function makeLine( geo , color = 'white', rotation = null) {
 
 	var g = new MeshLine();
-	g.setGeometry( geo, function( p ) { return Math.pow(p, params.SSlineTaper); });
+	if (params.timeStep < 1.e4 && params.timeStep >= 0 && !inSSEvolTween){
+		g.setGeometry( geo, function( p ) { return Math.pow(p, params.SSlineTaper ) ; });
+	} else {
+		g.setGeometry(geo)
+	}
 
 	var material = new MeshLineMaterial({
 		color: new THREE.Color(color),
@@ -104,12 +89,26 @@ function makeLine( geo , color = 'white', rotation = null) {
 
 }
 
+function initPlanetInterps(){
+
+	for (var i=0; i< planets.length; i ++){
+		planetsEvol[planets[i].name + "Evol"].smaInterp = new THREE.LinearInterpolant(
+			new Float32Array(planetsEvol[planets[i].name + "Evol"].time),
+			new Float32Array(planetsEvol[planets[i].name + "Evol"].semi_major_axis),
+			1,
+			new Float32Array( 1 )
+		);
+
+	}
+
+}
 function drawOrbitLines()
 {
 	// line
 	for (var i=0; i<planets.length; i++){
-		if (planetsEvol[planets[i].name + "Evol"].semi_major_axis.length > params.iEvol){
-			geo = createOrbit(planetsEvol[planets[i].name + "Evol"].semi_major_axis[params.iEvol], planets[i].eccentricity, THREE.Math.degToRad(planets[i].inclination), THREE.Math.degToRad(planets[i].longitude_of_ascending_node), THREE.Math.degToRad(planets[i].argument_of_periapsis), planets[i].tperi, planets[i].period, Ntheta = 100.);
+		if (planetsEvol[planets[i].name + "Evol"].semi_major_axis.length > Math.floor(SuniEvol)){
+			sma = planetsEvol[planets[i].name + "Evol"].smaInterp.evaluate(params.futureMillionYrs)
+			geo = createOrbit(sma, planets[i].eccentricity, THREE.Math.degToRad(planets[i].inclination), THREE.Math.degToRad(planets[i].longitude_of_ascending_node), THREE.Math.degToRad(planets[i].argument_of_periapsis), planets[i].tperi, planets[i].period, Ntheta = 100.);
 			makeLine( geo ,  color = pcolors[planets[i].name], rotation = SSrotation);		
 		}
 	}

@@ -17,6 +17,7 @@ var AUfac = 206264.94195722;
 var orbitLines = [];
 var SunMesh;
 var coronaMesh;
+var SuniEvol = 0;
 var HZMesh;
 var MilkyWayMesh = [];
 var M83mesh;
@@ -33,6 +34,7 @@ var redoExoplanetsTween = false;
 var SSrotation = new THREE.Vector3(THREE.Math.degToRad(63.), 0., -Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
 
 var maxHZa = 0.;
+var maxTime = 0.;
 var SunR0;
 var iLength;
 var bbTex;
@@ -51,15 +53,12 @@ var loaded = false;
 var ParamsInit;
 var params;
 
-var gui = new dat.GUI();
-var toursGUI = gui.addFolder('Tours');
-var cameraGUI = gui.addFolder('Camera');
-var SSGUI = gui.addFolder('Solar System Evolution');
-var exopGUI = gui.addFolder('Exoplanets');
-var MWGUI = gui.addFolder('Milky Way');
+var gui = new dat.GUI({ width: 350 } );
+
 
 //for tweens
 var exoplanetsON = true;
+var exoplanetsOFFtime = false;
 var exoplanetsInTweening = false;
 var exopAlphaTween;
 var exopAlphaTweenValue;
@@ -68,6 +67,13 @@ var SolarSystemON = true;
 var SolarSystemInTweening = false;
 var SSAlphaTween;
 var SSAlphaTweenValue;
+
+var MilkyWayON = true;
+var MWOFFtime = false;
+var MWInTweening = false;
+var MWAlphaTween;
+var MWAlphaTweenValue;
+var MWDfac = 1.e9; //distance from camera when we should start fading in/out Milky Way
 
 var MWTarget = new THREE.Vector3(0, 0, 5e9);
 var SSTarget = new THREE.Vector3(5.265142493522873, -66.50796619594568, 35.073211063757014);
@@ -82,6 +88,7 @@ var exoplanetViewTweenOut;
 var exoplanetViewTweenIn;
 var exoplanetTarget;
 var KeplerFlyThroughTween;
+var inSSEvolTween = false;
 
 function init() {
 	// scene
@@ -228,7 +235,6 @@ function defineParams(){
 		this.SSlineTaper = 1./4.;
 		this.iEvol = 0;
 		this.diEvol = 0;
-		this.autoUpdateSS = false;
 		this.SSalpha = 1.;
 		this.HZalpha = 0.2;
 		this.coronaSize = 10.;
@@ -239,7 +245,7 @@ function defineParams(){
 		//factor to exagerate color (set to 1 for no exageration)
         this.Teffac = 1.5;
   		this.ShowHideSolarSystem = function() {
-    		getController(SSGUI, params, "ShowHideSolarSystem").disabled = true;
+    		getController(gui, params, "ShowHideSolarSystem").disabled = true;
        		if (!SolarSystemInTweening){
 				SSAlphaTween.start();
 			}
@@ -254,10 +260,13 @@ function defineParams(){
 		this.exopAlpha = 1.;
         this.exopColorMode = 2;
         this.exopMarkerMode = 1;
-        this.timeYrs = 2017;
-        this.exopOrbitTimeYrs = 2017;
+        this.pastYrs = 2017;
+        this.futureHours = 0.;
+        this.futureDays = 0.;
+        this.futureYrs = 0.;
+        this.futureMillionYrs = 0;
   		this.ShowHideExoplanets = function() {
-    		getController(exopGUI, params, "ShowHideExoplanets").disabled = true;
+    		getController(gui, params, "ShowHideExoplanets").disabled = true;
         	if (!exoplanetsInTweening){
 				exopAlphaTween.start();
 			}
@@ -265,7 +274,12 @@ function defineParams(){
 //Galaxy controls
 		this.MWalpha = 1.;
 		this.M83alpha = 0.5;
-
+		this.ShowHideMilkyWay = function() {
+    		getController(gui, params, "ShowHideMilkyWay").disabled = true;
+       		if (!MWInTweening){
+				MWAlphaTween.start();
+			}
+		};
 //tours
 		this.MilkyWayView = function() {
 			if (redoExoplanetsTween) params.ShowHideExoplanets();
@@ -329,6 +343,37 @@ function defineParams(){
 
 			}
 		}
+		this.ExoplanetDiscoveriesByYr = function() {
+			starting = {"value":1990};
+			exopDiscTween = new TWEEN.Tween(starting).to({"value":2017}, 4000);
+			exopDiscTween.onUpdate(function(object){
+				params.pastYrs = object.value;
+				params.updateSSExop()
+			});
+			exopDiscTween.start()
+		}
+		this.FutureSolarSystem = function() {
+			if (!SolarSystemON){
+				params.ShowHideSolarSystem();
+			}
+			if (exoplanetsON){
+				params.ShowHideExoplanets();
+			}
+			//if (MilkyWayON){
+			//	params.ShowHideMilkyWay();
+			//}
+			starting = {"value":0};
+			SSEvolTween = new TWEEN.Tween(starting).to({"value":iLength-1}, 30000);
+			SSEvolTween.onUpdate(function(object){
+				inSSEvolTween = true;
+				params.futureMillionYrs = SunEvol.timeInterp.evaluate(object.value);
+				params.updateSSExop();
+			});
+			SSEvolTween.onComplete(function(){
+				inSSEvolTween = false;
+			});
+			SSEvolTween.start()
+		}
 
 //functions
         this.updateFriction = function() {
@@ -373,13 +418,13 @@ function defineParams(){
 					//could probably do some tween here
 					//note yrDiscovered is negative for habitable planets
 					var alpha = 0;
-					if (Math.abs(exoplanets.yrDiscovered[i]) <= params.timeYrs){
+					if (Math.abs(exoplanets.yrDiscovered[i]) <= params.pastYrs){
 						alpha = 1;
 					}
 					e.material.uniforms.exopAlpha.value = alpha * params.exopAlpha;
 					var planetAngle = -999.
 					if (exoplanets.period[i] > 0){
-						planetAngle = 2.*Math.PI * ( (params.exopOrbitTimeYrs * 365.2422)/exoplanets.period[i] % 1.)
+						planetAngle = 2.*Math.PI * ( (params.futureMillionYrs * 1.e6 * 365.2422)/exoplanets.period[i] % 1.)
 					}
 					e.material.uniforms.planetAngle.value = planetAngle;
 
@@ -400,42 +445,90 @@ function defineParams(){
 				SSAlphaTween.to({"value":0});
 			}
 
-			if (params.showSolarSystem){
-
-				params.iEvol = parseInt(params.iEvol);
-				params.diEvol = parseInt(params.diEvol);
+			if (params.ShowHideSolarSystem){
 
 				clearOrbitLines();
 				drawOrbitLines();
-				//updateOrbitLines();
 
 				clearHZ();
 				drawHZ();
-				//HZMesh.material.uniforms.ain.value = HZEvol.ain[params.iEvol];
-				//HZMesh.material.uniforms.aout.value = HZEvol.aout[params.iEvol];
 
 				clearSun();
 				drawSun();
-				//var scale = SunEvol.radius[params.iEvol]/SunR0;
-				//SunMesh.scale.x = scale;
-				//SunMesh.scale.y = scale;
-				//SunMesh.scale.z = scale;
+
 			}
 		}
 
+		this.updateSSExop = function(){
+			params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs), 2017);
+
+			/*
+			if (params.futureMillionYrs > 1){
+				if (exoplanetsON){
+					if (!exoplanetsInTweening) params.ShowHideExoplanets();
+					exoplanetsOFFtime = true;
+				}
+				if (MilkyWayON){
+					if (!MWInTweening) params.ShowHideMilkyWay();
+					MWOFFtime = true;
+				}
+			} else {
+				if (!exoplanetsON && exoplanetsOFFtime){
+					if (!exoplanetsInTweening) params.ShowHideExoplanets();
+					exoplanetsOFFtime = false;
+				}
+				if (!MilkyWayON && MWOFFtime){
+					if (!MWInTweening) params.ShowHideMilkyWay();
+					MWOFFtime = false;
+				}
+			}
+	*/
+			params.updateSolarSystem();
+			params.updateExoplanets();
+		}
 
 		this.updateMW = function() {
-			MilkyWayMesh.forEach( function( m, i ) {
-				m.material.uniforms.MWalpha.value = params.MWalpha;
-			});
+			if (MWAlphaTweenValue.value == 0){
+				MWAlphaTweenValue.value = 0;
+				MWAlphaTween.to({"value":params.MWalpha})
+			} else {
+				MWAlphaTweenValue.value = params.MWalpha;
+				MWAlphaTween.to({"value":0});
+			}
+			if (MilkyWayON){
+				MilkyWayMesh.forEach( function( m, i ) {
+					m.material.uniforms.MWalpha.value = params.MWalpha;
+				});
+			}
 		}
 	};
 	params = new ParamsInit();
 
+	gui.add( params, 'pastYrs', 1990, 2017).listen().onChange( params.updateSSExop );
+	gui.add( params, 'futureMillionYrs', 0, maxTime).listen().onChange( params.updateSSExop );
+
+	gui.add( params, 'timeStepUnit', { "None": 0, "Hour": (1./8760.), "Day": (1./365.2422), "Year": 1, "Million Years": 1e6, "Equal Solar Mass Loss": -1. } );//.onChange( params.updateSSExop );
+	gui.add( params, 'timeStepFac', 0, 100 );//.onChange( params.updateSSExop );
+	gui.add( params, 'ShowHideSolarSystem');
+	gui.add( params, 'ShowHideExoplanets');
+	gui.add( params, 'ShowHideMilkyWay');
+
+	gui.add( params, 'exopColorMode',{ "DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3 } ).onChange( params.updateExoplanets );
+	gui.add( params, 'exopMarkerMode',{ "BullsEye": 1, "Orrery": 2} ).onChange( params.updateExoplanets );
+
+	var toursGUI = gui.addFolder('Tours');
+	var extraControls  = gui.addFolder('Extra Controls')
+	var cameraGUI = extraControls.addFolder('Camera');
+	var SSGUI = extraControls.addFolder('Solar System');
+	var exopGUI = extraControls.addFolder('Exoplanets');
+	var MWGUI = extraControls.addFolder('Milky Way');
+
 	toursGUI.add( params, 'MilkyWayView');
 	toursGUI.add( params, 'SolarSystemView');
+	toursGUI.add( params, 'FutureSolarSystem');
 	toursGUI.add( params, 'KeplerView');
 	toursGUI.add( params, 'KeplerFlyThrough');
+	toursGUI.add( params, 'ExoplanetDiscoveriesByYr');
 	var exopSelect = {"Select":""}
 	uExoplanets.name.forEach(function(e){
 		var i = exoplanets.name.indexOf(e);
@@ -454,9 +547,6 @@ function defineParams(){
 	cameraGUI.add( params, 'zoomSpeed',0.01,5).onChange(params.updateZoom);
 	cameraGUI.add( params, 'resetCamera')
 
-	SSGUI.add( params, 'ShowHideSolarSystem');
-	SSGUI.add( params, 'iEvol', 0, iLength-1).listen().onChange( params.updateSolarSystem );
-	SSGUI.add( params, 'diEvol',0, 100 ).onChange( params.updateSolarSystem );
 	SSGUI.add( params, 'lineWidth', 0, 0.01).onChange( params.updateSolarSystem );
 	SSGUI.add( params, 'SSalpha',0., 1. ).onChange( params.updateSolarSystem );
 	SSGUI.add( params, 'HZalpha',0., 1. ).onChange( params.updateSolarSystem );
@@ -464,14 +554,8 @@ function defineParams(){
 	SSGUI.add( params, 'coronaP',0.1, 3 ).onChange( params.updateSolarSystem );
 	SSGUI.add( params, 'coronaAlpha',0., 1. ).onChange( params.updateSolarSystem );
 
-	exopGUI.add( params, 'ShowHideExoplanets');
-	exopGUI.add( params, 'timeYrs', 1990, 2017).listen().onChange( params.updateExoplanets );
-	exopGUI.add( params, 'timeStepUnit', { None: 0, Hour: (1./8760.), Day: (1./365.2422), Year: 1, MillionYears: 1e6 } ).onChange( params.updateExoplanets );
-	exopGUI.add( params, 'timeStepFac', 0, 100 ).onChange( params.updateExoplanets );
 	exopGUI.add( params, 'exopSize',0.01, 2. ).onChange( params.updateExoplanets );
 	exopGUI.add( params, 'exopAlpha',0., 1. ).onChange( params.updateExoplanets );
-	exopGUI.add( params, 'exopColorMode',{ "DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3 } ).onChange( params.updateExoplanets );
-	exopGUI.add( params, 'exopMarkerMode',{ "BullsEye": 1, "Orrery": 2} ).onChange( params.updateExoplanets );
 
 	MWGUI.add( params, 'MWalpha',0., 1. ).onChange( params.updateMW );
 
@@ -499,7 +583,7 @@ function defineTweens(){
 	exopAlphaTween.onComplete(function(object){
 		exoplanetsInTweening = false;
 		redoExoplanetsTween = false;
-		getController(exopGUI, params, "ShowHideExoplanets").disabled = false;
+		getController(gui, params, "ShowHideExoplanets").disabled = false;
 		if (exoplanetsON){
 			this.to({"value":0.})
 		} else {
@@ -511,7 +595,7 @@ function defineTweens(){
 	});
 
 
-	//for easing the alpah on the Solar System to turn them off
+	//for easing the alpha on the Solar System to turn them off
 	SSAlphaTweenValue = {"value":params.SSalpha};
 	SSAlphaTween = new TWEEN.Tween(SSAlphaTweenValue).to({"value":0}, 1000);
 	SSAlphaTween.onStart(function(){
@@ -529,7 +613,7 @@ function defineTweens(){
 	});
 	SSAlphaTween.onComplete(function(object){
 		SolarSystemInTweening = false;
-		getController(SSGUI, params, "ShowHideSolarSystem").disabled = false;
+		getController(gui, params, "ShowHideSolarSystem").disabled = false;
 		if (SolarSystemON){
 			this.to({"value":0.})
 		} else {
@@ -537,6 +621,29 @@ function defineTweens(){
 		}
 	});
 
+	//for easing the alpha on the Milky Way to turn it off
+	MWAlphaTweenValue = {"value":params.MWalpha};
+	MWAlphaTween = new TWEEN.Tween(MWAlphaTweenValue).to({"value":0}, 1000);
+	MWAlphaTween.onStart(function(){
+		MilkyWayON = !MilkyWayON;
+		MWInTweening = true;
+	});
+	MWAlphaTween.onUpdate(function(object){
+		var MWalpha = Math.min(object.value, Math.max(0., (1. - MWDfac/camDist)));
+		MilkyWayMesh.forEach( function( m, i ) {
+			m.material.uniforms.MWalpha.value = MWalpha;
+		});	
+		MWInnerMesh.material.opacity = Math.min(object.value, Math.max(0., 0.5*MWDfac/camDist));
+	});
+	MWAlphaTween.onComplete(function(object){
+		MWInTweening = false;
+		getController(gui, params, "ShowHideMilkyWay").disabled = false;
+		if (MilkyWayON){
+			this.to({"value":0.})
+		} else {
+			this.to({"value":params.MWalpha});
+		}
+	});
 
 	//for moving position out to the MW
 	
@@ -616,19 +723,21 @@ function WebGLStart(){
 
 	getUniqExoplanets();
 
-
-
 	planetsEvol = {MercuryEvol, VenusEvol, EarthMoonEvol, MarsEvol, JupiterEvol, SaturnEvol, UranusEvol, NeptuneEvol, PlutoEvol}
 
 
 
 	SunR0 = SunEvol.radius[0];
 	getmaxHZa();
+	setMaxTime();
 
 //initialize
 	defineParams();
 	init();
 	defineTweens();
+	initSunInterps();
+	initPlanetInterps();
+	initHZInterps();
 
 //draw everything
 	drawInnerMilkyWay();
