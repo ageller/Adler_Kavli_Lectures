@@ -49,6 +49,9 @@ function render() {
 	camDist = CameraDistance();
 
 	//for updating the exoplanets
+	if (parseFloat(params.pastYrs) < 2017){
+		params.futureMillionYrs = 0.
+	}
 	params.timeStep = parseFloat(params.timeStepUnit)*parseFloat(params.timeStepFac);
 	params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs)*1.e6, 2017);
 	if (params.timeStep > 0){

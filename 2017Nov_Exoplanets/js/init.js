@@ -532,9 +532,17 @@ function defineParams(){
 
 			}
 		}
-
+		this.updatefutureMillionYrs = function() {
+			if (parseFloat(params.futureMillionYrs) > 0){
+				params.pastYrs = 2017
+			}
+			params.updateSSExop();
+		}
 		this.updateSSExop = function(){
-			params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs), 2017);
+			if (parseFloat(params.pastYrs) < 2017){
+				params.futureMillionYrs = 0.
+			}
+			params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs)*1.e6, 2017);
 
 			/*
 			if (params.futureMillionYrs > 1){
@@ -587,7 +595,7 @@ function defineParams(){
 	basicGUI = gui.addFolder('Controller');
 
 	basicGUI.add( params, 'pastYrs', 1990, 2017).listen().onChange( params.updateSSExop );
-	basicGUI.add( params, 'futureMillionYrs', 0, maxTime).listen().onChange( params.updateSSExop );
+	basicGUI.add( params, 'futureMillionYrs', 0, maxTime).listen().onChange( params.updatefutureMillionYrs );
 
 	basicGUI.add( params, 'timeStepUnit', { "None": 0, "Hour": (1./8760.), "Day": (1./365.2422), "Year": 1, "Million Years": 1e6, "Equal Solar Mass Loss": -1. } );//.onChange( params.updateSSExop );
 	basicGUI.add( params, 'timeStepFac', 0, 100 );//.onChange( params.updateSSExop );
