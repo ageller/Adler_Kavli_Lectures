@@ -107,7 +107,7 @@ void main()
 		//if (r > (dS-drawWidth) && r < dS){
 		//	color.a = smoothstep(dS-drawWidth, dS,r );
 		//}
-		if (planetAngle > 0.){
+		if (planetAngle >= 0.){
 			vec2 planetPos = drawStart * afac * vec2(cos(planetAngle), sin(planetAngle));
 			if (length(vPosition.xy/size - planetPos) < 0.05*planetSize) {
 				color = markerColor;

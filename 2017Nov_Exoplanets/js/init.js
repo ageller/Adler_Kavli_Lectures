@@ -54,17 +54,20 @@ var ParamsInit;
 var params;
 
 var gui = new dat.GUI({ width: 350 } );
-
+var basicGUI;
+var legendGUI = null;
 
 //for tweens
 var exoplanetsON = true;
 var exoplanetsOFFtime = false;
 var exoplanetsInTweening = false;
+var exoplanetsInMotion = false;
 var exopAlphaTween;
 var exopAlphaTweenValue;
 
 var SolarSystemON = true;
 var SolarSystemInTweening = false;
+var SSValsNeedReset = false;
 var SSAlphaTween;
 var SSAlphaTweenValue;
 
@@ -89,6 +92,8 @@ var exoplanetViewTweenIn;
 var exoplanetTarget;
 var KeplerFlyThroughTween;
 var inSSEvolTween = false;
+
+
 
 function init() {
 	// scene
@@ -218,6 +223,55 @@ Object.defineProperty(dat.controllers.FunctionController.prototype, "disabled", 
   },
   enumerable: true
 });
+//https://stackoverflow.com/questions/18085540/remove-folder-in-dat-gui
+dat.GUI.prototype.removeFolder = function(name) {
+	var folder = this.__folders[name];
+	if (!folder) {
+	return;
+	}
+	folder.close();
+	this.__ul.removeChild(folder.domElement.parentNode);
+	delete this.__folders[name];
+	this.onResize();
+}
+
+function addToLegend(val){
+	legendGUI.addColor( params, val);
+	var foo = getController(legendGUI, params, val);
+	foo.__selector.outerHTML = "";
+	delete foo.__selector;	
+	foo.__input.style.color = foo.__input.style.backgroundColor;//'rgb('+params[val]+')';
+	foo.__input.style.textShadow = 'rgba(0,0,0,0) 0px 0px 0px';
+}
+function makeLegend(type){
+//	"DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3
+	if (legendGUI != null){
+		gui.removeFolder('Legend');
+	}
+
+	legendGUI = gui.addFolder('Legend');
+
+	if (type == 1){
+		addToLegend("radialVelocity");
+		addToLegend("transit");
+		addToLegend("transitTiming");
+		addToLegend("imaging");
+		addToLegend("microlens");
+		addToLegend("noData");
+	}
+	if (type == 2){
+		addToLegend("subEarths");
+		addToLegend("Earths");
+		addToLegend("superEarths");
+		addToLegend("Neptunes");
+		addToLegend("Jupiters");
+		addToLegend("larger");
+	}
+	if (type == 3){
+		addToLegend("inHabitableZone");
+		addToLegend("outside");
+	}
+}
 
 function defineParams(){
 
@@ -230,12 +284,29 @@ function defineParams(){
 		this.zoomSpeed = 1.;
 		this.stereoSep = 0.064;
 
+//for Legend
+		this.noData = [128., 128., 128.]
+		this.transit = [255., 255., 0.];
+		this.imaging = [0., 255., 0.];
+		this.microlens = [51., 51., 255.];
+		this.transitTiming = [255., 128., 0.];
+		this.radialVelocity = [255., 51., 255.];
+		this.subEarths = [255., 51., 255.];
+		this.Earths = [51., 51., 255.];
+		this.superEarths = [0, 255., 0.];
+		this.Neptunes = [255., 255., 51.];
+		this.Jupiters = [255., 128., 0.];
+		this.larger = [128., 128., 128.];
+		this.inHabitableZone = [51., 51., 255.];
+		this.outside = [128., 128., 128.];
+
 //Solar System evolution controls
 		this.lineWidth = 0.003;
 		this.SSlineTaper = 1./4.;
 		this.iEvol = 0;
 		this.diEvol = 0;
 		this.SSalpha = 1.;
+		this.useSSalpha = 1.;
 		this.HZalpha = 0.2;
 		this.coronaSize = 10.;
 		this.coronaP = 0.3;
@@ -245,7 +316,7 @@ function defineParams(){
 		//factor to exagerate color (set to 1 for no exageration)
         this.Teffac = 1.5;
   		this.ShowHideSolarSystem = function() {
-    		getController(gui, params, "ShowHideSolarSystem").disabled = true;
+    		getController(basicGUI, params, "ShowHideSolarSystem").disabled = true;
        		if (!SolarSystemInTweening){
 				SSAlphaTween.start();
 			}
@@ -266,7 +337,7 @@ function defineParams(){
         this.futureYrs = 0.;
         this.futureMillionYrs = 0;
   		this.ShowHideExoplanets = function() {
-    		getController(gui, params, "ShowHideExoplanets").disabled = true;
+    		getController(basicGUI, params, "ShowHideExoplanets").disabled = true;
         	if (!exoplanetsInTweening){
 				exopAlphaTween.start();
 			}
@@ -275,7 +346,7 @@ function defineParams(){
 		this.MWalpha = 1.;
 		this.M83alpha = 0.5;
 		this.ShowHideMilkyWay = function() {
-    		getController(gui, params, "ShowHideMilkyWay").disabled = true;
+    		getController(basicGUI, params, "ShowHideMilkyWay").disabled = true;
        		if (!MWInTweening){
 				MWAlphaTween.start();
 			}
@@ -314,6 +385,7 @@ function defineParams(){
 			if (redoExoplanetsTween || !exoplanetsON) params.ShowHideExoplanets();
 
 			if (params.GoToExoplanet != ""){
+				exoplanetsInMotion = true;
 
 				var i = uExoplanets.name.indexOf(params.GoToExoplanet);
 				var pos = uExoplanets.position[i];
@@ -343,7 +415,8 @@ function defineParams(){
 
 			}
 		}
-		this.ExoplanetDiscoveriesByYr = function() {
+		this.ExoplanetDiscoveryYrs = function() {
+			params.futureMillionYrs = 0.;
 			starting = {"value":1990};
 			exopDiscTween = new TWEEN.Tween(starting).to({"value":2017}, 4000);
 			exopDiscTween.onUpdate(function(object){
@@ -397,24 +470,29 @@ function defineParams(){
 
         }
         this.updateExoplanets = function() {
-			if (exopAlphaTweenValue.value == 0){
-				exopAlphaTweenValue.value = 0;
-				exopAlphaTween.to({"value":params.exopAlpha})
-			} else {
-				exopAlphaTweenValue.value = params.exopAlpha;
-				exopAlphaTween.to({"value":0});
+/*        	if (!exoplanetsInTweening && !exoplanetsInMotion){
+				if (exopAlphaTweenValue.value == 0){
+					exopAlphaTween.to({"value":params.exopAlpha})
+				} 
+				if (exopAlphaTweenValue.value = params.exopAlpha){
+					exopAlphaTween.to({"value":0});
+				}
 			}
-
-			if (exoplanetsON){
+*/
+			exoplanetsMesh.forEach( function( e, i ) {
+				e.material.uniforms.colorMode.value = params.exopColorMode;
+				e.material.uniforms.markerMode.value = params.exopMarkerMode;
+				var planetAngle = -999.
+				if (exoplanets.period[i] > 0){
+					planetAngle = 2.*Math.PI * ( (params.futureMillionYrs * 1.e6 * 365.2422)/exoplanets.period[i] % 1.)
+				}
+				e.material.uniforms.planetAngle.value = planetAngle;
+			});
+			if (exoplanetsON && !exoplanetsInTweening){
 				params.exoplanetMinSize = exoplanetMinSize0*params.exopSize/exopSize0;
 				params.exoplanetMaxSize = exoplanetMaxSize0*params.exopSize/exopSize0;
 
 				exoplanetsMesh.forEach( function( e, i ) {
-					//e.scale.x = params.exopSize/exopSize0;
-					//e.scale.y = params.exopSize/exopSize0;
-					e.material.uniforms.colorMode.value = params.exopColorMode;
-					e.material.uniforms.markerMode.value = params.exopMarkerMode;
-
 					//could probably do some tween here
 					//note yrDiscovered is negative for habitable planets
 					var alpha = 0;
@@ -422,30 +500,26 @@ function defineParams(){
 						alpha = 1;
 					}
 					e.material.uniforms.exopAlpha.value = alpha * params.exopAlpha;
-					var planetAngle = -999.
-					if (exoplanets.period[i] > 0){
-						planetAngle = 2.*Math.PI * ( (params.futureMillionYrs * 1.e6 * 365.2422)/exoplanets.period[i] % 1.)
-					}
-					e.material.uniforms.planetAngle.value = planetAngle;
 
 				} );
 			}
-
-			params.updateSolarSystem();
 
         }
 
 
 		this.updateSolarSystem = function() {
-			if (SSAlphaTweenValue.value == 0){
-				SSAlphaTweenValue.value = 0;
-				SSAlphaTween.to({"value":params.SSalpha})
-			} else {
-				SSAlphaTweenValue.value = params.SSalpha;
-				SSAlphaTween.to({"value":0});
+        	if (SSValsNeedReset){
+        		SSValsNeedReset = false;
+				if (SSAlphaTweenValue.value == 0){
+					SSAlphaTweenValue.value = 0;
+					SSAlphaTween.to({"value":params.SSalpha})
+				} else {
+					SSAlphaTweenValue.value = params.SSalpha;
+					SSAlphaTween.to({"value":0});
+				}
 			}
 
-			if (params.ShowHideSolarSystem){
+			if (SolarSystemON){
 
 				clearOrbitLines();
 				drawOrbitLines();
@@ -501,34 +575,38 @@ function defineParams(){
 				});
 			}
 		}
+		this.updateLegend = function(){
+			makeLegend(params.exopColorMode);
+			params.updateExoplanets();
+		}
 	};
+
+
 	params = new ParamsInit();
 
-	gui.add( params, 'pastYrs', 1990, 2017).listen().onChange( params.updateSSExop );
-	gui.add( params, 'futureMillionYrs', 0, maxTime).listen().onChange( params.updateSSExop );
+	basicGUI = gui.addFolder('Controller');
 
-	gui.add( params, 'timeStepUnit', { "None": 0, "Hour": (1./8760.), "Day": (1./365.2422), "Year": 1, "Million Years": 1e6, "Equal Solar Mass Loss": -1. } );//.onChange( params.updateSSExop );
-	gui.add( params, 'timeStepFac', 0, 100 );//.onChange( params.updateSSExop );
-	gui.add( params, 'ShowHideSolarSystem');
-	gui.add( params, 'ShowHideExoplanets');
-	gui.add( params, 'ShowHideMilkyWay');
+	basicGUI.add( params, 'pastYrs', 1990, 2017).listen().onChange( params.updateSSExop );
+	basicGUI.add( params, 'futureMillionYrs', 0, maxTime).listen().onChange( params.updateSSExop );
 
-	gui.add( params, 'exopColorMode',{ "DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3 } ).onChange( params.updateExoplanets );
-	gui.add( params, 'exopMarkerMode',{ "BullsEye": 1, "Orrery": 2} ).onChange( params.updateExoplanets );
+	basicGUI.add( params, 'timeStepUnit', { "None": 0, "Hour": (1./8760.), "Day": (1./365.2422), "Year": 1, "Million Years": 1e6, "Equal Solar Mass Loss": -1. } );//.onChange( params.updateSSExop );
+	basicGUI.add( params, 'timeStepFac', 0, 100 );//.onChange( params.updateSSExop );
+	basicGUI.add( params, 'ShowHideSolarSystem');
+	basicGUI.add( params, 'ShowHideExoplanets');
+	basicGUI.add( params, 'ShowHideMilkyWay');
 
+	basicGUI.add( params, 'exopColorMode',{ "DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3 } ).onChange( params.updateLegend );
+	basicGUI.add( params, 'exopMarkerMode',{ "BullsEye": 1, "Orrery": 2} ).onChange( params.updateExoplanets );
+	basicGUI.open()
+
+//tours
 	var toursGUI = gui.addFolder('Tours');
-	var extraControls  = gui.addFolder('Extra Controls')
-	var cameraGUI = extraControls.addFolder('Camera');
-	var SSGUI = extraControls.addFolder('Solar System');
-	var exopGUI = extraControls.addFolder('Exoplanets');
-	var MWGUI = extraControls.addFolder('Milky Way');
-
 	toursGUI.add( params, 'MilkyWayView');
 	toursGUI.add( params, 'SolarSystemView');
 	toursGUI.add( params, 'FutureSolarSystem');
 	toursGUI.add( params, 'KeplerView');
 	toursGUI.add( params, 'KeplerFlyThrough');
-	toursGUI.add( params, 'ExoplanetDiscoveriesByYr');
+	toursGUI.add( params, 'ExoplanetDiscoveryYrs');
 	var exopSelect = {"Select":""}
 	uExoplanets.name.forEach(function(e){
 		var i = exoplanets.name.indexOf(e);
@@ -540,6 +618,14 @@ function defineParams(){
 	});
 	toursGUI.add( params, 'GoToExoplanet',exopSelect ).onChange( params.GoToExoplanetTween );
 
+
+
+//extra controls
+	var extraControls  = gui.addFolder('Extra Controls')
+	var cameraGUI = extraControls.addFolder('Camera');
+	var SSGUI = extraControls.addFolder('Solar System');
+	var exopGUI = extraControls.addFolder('Exoplanets');
+	var MWGUI = extraControls.addFolder('Milky Way');
 	cameraGUI.add( params, 'fullscreen');
 	cameraGUI.add( params, 'stereo').onChange(params.updateStereo);
 	cameraGUI.add( params, 'stereoSep',0,1).onChange(params.updateStereo);
@@ -558,6 +644,9 @@ function defineParams(){
 	exopGUI.add( params, 'exopAlpha',0., 1. ).onChange( params.updateExoplanets );
 
 	MWGUI.add( params, 'MWalpha',0., 1. ).onChange( params.updateMW );
+
+
+	makeLegend(params.exopColorMode);
 
 }
 
@@ -583,7 +672,8 @@ function defineTweens(){
 	exopAlphaTween.onComplete(function(object){
 		exoplanetsInTweening = false;
 		redoExoplanetsTween = false;
-		getController(gui, params, "ShowHideExoplanets").disabled = false;
+		exoplanetsInMotion = false;
+		getController(basicGUI, params, "ShowHideExoplanets").disabled = false;
 		if (exoplanetsON){
 			this.to({"value":0.})
 		} else {
@@ -603,6 +693,7 @@ function defineTweens(){
 		SolarSystemInTweening = true;
 	});
 	SSAlphaTween.onUpdate(function(object){
+		params.useSSalpha = object.value;
 		orbitLines.forEach( function( l, i ) {
 			l.material.uniforms.opacity.value = object.value;
 		} );
@@ -613,7 +704,8 @@ function defineTweens(){
 	});
 	SSAlphaTween.onComplete(function(object){
 		SolarSystemInTweening = false;
-		getController(gui, params, "ShowHideSolarSystem").disabled = false;
+		SSValsNeedReset = true;
+		getController(basicGUI, params, "ShowHideSolarSystem").disabled = false;
 		if (SolarSystemON){
 			this.to({"value":0.})
 		} else {
@@ -637,7 +729,7 @@ function defineTweens(){
 	});
 	MWAlphaTween.onComplete(function(object){
 		MWInTweening = false;
-		getController(gui, params, "ShowHideMilkyWay").disabled = false;
+		getController(basicGUI, params, "ShowHideMilkyWay").disabled = false;
 		if (MilkyWayON){
 			this.to({"value":0.})
 		} else {
@@ -676,7 +768,8 @@ function defineTweens(){
 	exoplanetViewTween = new TWEEN.Tween(camera.position).to(exoplanetTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);	
 	exoplanetViewTween.onComplete(function(object){
 		controls.enabled = true;
-		exopAlphaTween.to({"value":0.2*params.exopAlpha}).start();
+		exopAlphaTweenValue.value = params.exopAlpha;
+		exopAlphaTween.to({"value":0.2*parseFloat(params.exopAlpha)}).start();
 	});
 
 	KeplerFlyThroughTween = new TWEEN.Tween(camera.position).to(KeplerTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);

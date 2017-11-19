@@ -65,7 +65,7 @@ function makeLine( geo , color = 'white', rotation = null) {
 
 	var material = new MeshLineMaterial({
 		color: new THREE.Color(color),
-		opacity: params.SSalpha,
+		opacity: params.useSSalpha,
 		//useAlphaMap: 1,
 		//alphaMap: aTex,
 		lineWidth: params.lineWidth,

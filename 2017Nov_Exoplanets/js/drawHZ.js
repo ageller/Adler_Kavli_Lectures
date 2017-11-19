@@ -40,7 +40,7 @@ function drawHZ(rotation = SSrotation)
 			ain: { value: ain },
 			aout: { value: aout },
 			color: {value: new THREE.Vector4(0., 1., 0., params.HZalpha) },
-			SSalpha: {value: params.SSalpha }
+			SSalpha: {value: params.useSSalpha }
 
 		},
 

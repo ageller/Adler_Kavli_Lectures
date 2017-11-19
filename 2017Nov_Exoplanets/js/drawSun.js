@@ -65,7 +65,7 @@ function drawSun()
 			sunTemp: {value: SunTeff},
 			sTeff: {value: params.sTeff},
 			Teffac: {value: params.Teffac},
-			SSalpha: {value: params.SSalpha },
+			SSalpha: {value: params.useSSalpha },
 			cameraCenter: {value: camera.position},
 		},
 
@@ -96,7 +96,7 @@ function drawSun()
 			sunTemp: {value: SunTeff},
 			sTeff: {value: params.sTeff},
 			Teffac: {value: params.Teffac},
-			SSalpha: {value: params.SSalpha },
+			SSalpha: {value: params.useSSalpha },
 
 
 		},
