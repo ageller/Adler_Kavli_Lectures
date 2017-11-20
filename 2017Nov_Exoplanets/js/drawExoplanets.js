@@ -32,6 +32,7 @@ function drawExoplanets()
 
 	for (var i=0; i<exoplanets.x.length; i++){
 
+if (exoplanets.name[i] == "TRAPPIST-1") console.log(exoplanets.ringInfo[i])
 //Mark had to combine to numbers a separate at the decimal because of the limitations in Uniview.  I'm using his same input for now, so I will do the same here.
 //if there is no distance known, the ringInfo will be negative
 		ringTot = parseInt(Math.floor(Math.abs(exoplanets.ringInfo[i])));
@@ -48,6 +49,7 @@ function drawExoplanets()
 		if (exoplanets.period[i] > 0){
 			planetAngle = 2.*Math.PI * ( (params.futureMillionYrs * 1.e6 * 365.2422)/exoplanets.period[i] % 1.)
 		}
+
 		var exopMaterial =  new THREE.ShaderMaterial( {
 			uniforms: {
 				exopAlpha: {value: params.exopAlpha},
@@ -55,7 +57,7 @@ function drawExoplanets()
 				mClass: {value: exoplanets.class[i]},
 				ringTot: {value: ringTot},
 				ringNum: {value: ringNum},
-				size: {value: 2.*gSize},
+				size: {value: gSize},
 				colorMode: {value: params.exopColorMode},
 				markerMode: {value: params.exopMarkerMode},
 				afac: {value: exoplanets.afac[i]},

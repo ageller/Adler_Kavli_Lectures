@@ -108,7 +108,7 @@ void main()
 		//}
 		if (planetAngle >= 0.){
 			vec2 planetPos = drawStart * afac * vec2(cos(planetAngle), sin(planetAngle));
-			if (length(vPosition.xy - planetPos) < 0.05*planetSize) {
+			if (length(vPosition.xy - planetPos) < 0.03*planetSize) {
 				color = markerColor;
 			}
 		}

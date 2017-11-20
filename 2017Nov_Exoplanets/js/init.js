@@ -621,7 +621,7 @@ function defineParams(){
 		ringTot = parseInt(Math.floor(Math.abs(exoplanets.ringInfo[i])));
 		var hab = Math.sign(exoplanets.yrDiscovered[i])
 		//if (exoplanets.ringInfo[i] > 0 && ringTot > 3) exopSelect[e] = e;
-		if (exoplanets.ringInfo[i] > 0 && hab == -1) exopSelect[e] = e;
+		if (exoplanets.ringInfo[i] > 0 && hab == -1 && exoplanets.period[i] > 0) exopSelect[e] = e;
 
 	});
 	toursGUI.add( params, 'GoToExoplanet',exopSelect ).onChange( params.GoToExoplanetTween );
