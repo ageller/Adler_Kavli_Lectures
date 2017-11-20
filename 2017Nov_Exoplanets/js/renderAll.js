@@ -6,15 +6,16 @@
 //check solar system orbit direction and relative positions of planets.
 //labels for the different colors, and tooltips?
 //make corona not leave a line over the HZ and orbit lines when very large?
-//why don't exoplanets show up on mobile?, https://developers.google.com/web/tools/chrome-devtools/remote-debugging/
 //can I use the alphaMap for the exoplanets (rather than taper)? Fix how it plots on top of HZ
 //can I shrink the file size of the textures?
 //add credits for the textures
 //improve the Galaxy -- and how it matches to the image
 //loading screen (including waiting for textures to load)
 //fog for exoplanets?
-//fix on/off for Galaxy and exoplanets with Myr timescales?
+//turn on/off for Galaxy and exoplanets with Myr timescales?
 //fix the "blink" of the centered exoplanet when you switch to a new exoplanet
+//why do some of the exoplanets not show any planet in Orery mode? see the ROXs
+//allow user to cancel/stop tour (maybe by clickin on the tour again?)
 
 function animate(time) {
 	requestAnimationFrame( animate );

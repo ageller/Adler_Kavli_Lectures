@@ -11,7 +11,6 @@ uniform int markerMode;
 
 uniform float ringNum;
 uniform float ringTot;
-uniform float size;
 uniform float afac;
 uniform float planetAngle;
 uniform float exopAlpha;
@@ -23,8 +22,8 @@ void main()
 
 	float planetSize = 0.5;
 
-    vec2 fromCenter = abs(vPosition.xy);
-    float dist = length(fromCenter);
+	vec2 fromCenter = abs(vPosition.xy);
+	float dist = length(fromCenter);
 
 	if (colorMode == 1){
 		if (method == 0){ //N/A
@@ -82,7 +81,7 @@ void main()
 	}
 
 
-	float r = dist/size;
+	float r = dist;
 
 	if (markerMode == 1){ //bullseye
 		float ulim = 0.5 * (0.6 * ringNum + 1.0);
@@ -109,7 +108,7 @@ void main()
 		//}
 		if (planetAngle >= 0.){
 			vec2 planetPos = drawStart * afac * vec2(cos(planetAngle), sin(planetAngle));
-			if (length(vPosition.xy/size - planetPos) < 0.05*planetSize) {
+			if (length(vPosition.xy - planetPos) < 0.05*planetSize) {
 				color = markerColor;
 			}
 		}

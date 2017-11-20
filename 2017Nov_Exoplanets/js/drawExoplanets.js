@@ -41,7 +41,7 @@ function drawExoplanets()
 		//console.log(ringTot, ringNum, exoplanets.ringInfo[i], lScale)
 
 	 	gSize = AUfac*params.exopSize * lScale; 
-		var geometry = new THREE.PlaneGeometry(gSize*2., gSize*2.);
+		var geometry = new THREE.PlaneGeometry(1, 1);
 		//var geometry = new THREE.PlaneGeometry(params.exopSize*8.*AUfac, params.exopSize*8.*AUfac);
 
 		planetAngle = -999.
@@ -55,7 +55,7 @@ function drawExoplanets()
 				mClass: {value: exoplanets.class[i]},
 				ringTot: {value: ringTot},
 				ringNum: {value: ringNum},
-				size: {value: gSize},
+				size: {value: 2.*gSize},
 				colorMode: {value: params.exopColorMode},
 				markerMode: {value: params.exopMarkerMode},
 				afac: {value: exoplanets.afac[i]},
@@ -64,7 +64,7 @@ function drawExoplanets()
 
 			},
 
-			vertexShader: myVertexShader,
+			vertexShader: exoplanetVertexShader,
 			fragmentShader: exoplanetFragmentShader,
 			depthWrite:false,
 			depthTest: false,
