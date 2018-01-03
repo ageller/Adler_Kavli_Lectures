@@ -164,7 +164,7 @@ function init() {
 	//controls.zoomSpeed = params.zoomSpeed;
 	controls = new THREE.TrackballControls( camera, renderer.domElement );
 	controls.minDistance = 2.;
-	controls.maxDistance = 2.e10;
+	controls.maxDistance = 1.e10;
 
 	controls.dynamicDampingFactor = params.friction;
  	controls.zoomSpeed = params.zoomSpeed;

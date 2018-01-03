@@ -35,7 +35,7 @@ function runExop(){
 		params.ShowHideExoplanets()
 	}
 	hideSplash();
-	controls.maxDistance = 2.e10;
+	controls.maxDistance = 1.e10;
 
 }
 function runSSEvol(){

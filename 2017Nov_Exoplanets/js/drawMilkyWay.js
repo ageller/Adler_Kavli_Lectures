@@ -18,12 +18,14 @@ function createDisk(Npoints, radius, scaleHeight){
 	return disk;
 }
 
-function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness, N, B, Nbar = -1, radmax = 1.){
+function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness, N, B, armsRot = 0., Nbar = -1, radmax = 1.){
 	var galaxy = new THREE.Geometry();
 
-	var armAngle = 270 / arms;
 
-	var vert, x, y, z, angle;
+	var vert, x, y, z, angle, vect;
+
+	var zaxis = new THREE.Vector3( 0, 0, 1 );
+	var yaxis = new THREE.Vector3( 0, 1, 0 );
 
 //http://adsabs.harvard.edu/abs/2009MNRAS.397..164R
 	for (i = 0; i <= starsPerArm; i++) {
@@ -35,13 +37,19 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 			y = r * Math.sin(angle) + Math.random() * armThickness;
 			z = (Math.random() - 0.5) * scaleHeight;
 
-			galaxy.vertices.push(new THREE.Vector3(x, y, z));
+			vect = new THREE.Vector3(x, y, z);
+			vect.applyAxisAngle( zaxis, armsRot );
+			vect.applyAxisAngle( yaxis, Math.PI );
+			galaxy.vertices.push(vect);
 
 			x = -r * Math.cos(angle) + Math.random() * armThickness;
 			y = -r * Math.sin(angle) + Math.random() * armThickness;
 			z = -1.*((Math.random() - 0.5) * scaleHeight);
 
-			galaxy.vertices.push(new THREE.Vector3(x, y, z));
+			vect = new THREE.Vector3(x, y, z);
+			vect.applyAxisAngle( zaxis, armsRot );
+			vect.applyAxisAngle( yaxis, Math.PI );
+			galaxy.vertices.push(vect);
 		}
 	}
 
@@ -56,7 +64,10 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 		y = Math.random() * armThickness;
 		z = (Math.random() - 0.5) * scaleHeight;
 
-		galaxy.vertices.push(new THREE.Vector3(x, y, z));
+			vect = new THREE.Vector3(x, y, z);
+			vect.applyAxisAngle( zaxis, armsRot );
+			vect.applyAxisAngle( yaxis, Math.PI );
+			galaxy.vertices.push(vect);
 
 	}
 
@@ -69,20 +80,20 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 function drawMilkyWay()
 {
 
-	var scaleUp = AUfac*3e4; //milky way radius in pc converted to AU
+	var scaleUp = AUfac*1.2e4;//AUfac*3e4; //milky way radius in pc converted to AU
 	var center = new THREE.Vector3(8500.*AUfac, 0., 0.);
 	//var center = new THREE.Vector3(0., 0., 0.);
 
-	var radius = 0.5;
+	var radius = 1.2;
 	var scaleHeight = 0.1;
 	var N = 15.; //winding tightness
-	var B = 3.; //bulge-to-arm size
+	var B = 2.5; //bulge-to-arm size
 	var fac3 = 20.;
-
+	var armsRot = -Math.PI/8.;
 	var barRad = 2.*radius; //to make the inner part more yellow
 
 	var Ssize = 0.5; //size of star points
-	var dfac = 4; //descrease in size of star points with distance from center (to help make bulge brighter)
+	var dfac = 4; //decrease in size of star points with distance from center (to help make bulge brighter)
 
 	//blue disk
 /*	var disk = createDisk(500, 1.8*radius, scaleHeight);
@@ -157,7 +168,7 @@ function drawMilkyWay()
 	mesh0.position.set(center.x, center.y, center.z);
 */
 
-	var galaxy1 = createSpiralGalaxy(2, 1000, radius, scaleHeight, 0.5, N*fac3, B*fac3, Nbar = -1., radmax=4.); //blue
+	var galaxy1 = createSpiralGalaxy(2, 1000, radius, scaleHeight, 0.5, N*fac3, B*fac3, armsRot = armsRot, Nbar = -1., radmax=1.5); //blue
 	var size1 = 3.*scaleUp;
 	var galaxy1Material = new THREE.ShaderMaterial( { 
 		uniforms: {
@@ -229,7 +240,7 @@ function drawMilkyWay()
 	mesh3.position.set(center.x, center.y, center.z);
 */
 	//white stars
-	var galaxy4 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N, B, Nbar = 50); //red
+	var galaxy4 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N, B, armsRot = armsRot, Nbar = 50, radmax = 1.2); 
 	var size4 = Ssize*scaleUp;
 	var galaxy4Material = new THREE.ShaderMaterial( { 
 		uniforms: {
@@ -253,7 +264,7 @@ function drawMilkyWay()
 	mesh4.position.set(center.x, center.y, center.z);
 
 	//white stars
-	var galaxy5 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N*fac3*0.6, B*fac3*0.9,  Nbar = 50); //red
+	var galaxy5 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N*fac3*0.6, B*fac3*0.9, armsRot = armsRot,  Nbar = 50, radmax = 1.2); 
 	var size5 = Ssize*scaleUp;
 	var galaxy4Material = new THREE.ShaderMaterial( { 
 		uniforms: {
@@ -303,11 +314,13 @@ function drawMilkyWay()
 	//MilkyWayMesh.push(meshd);
 	//MilkyWayMesh.push(meshb);
 	//MilkyWayMesh.push(mesh0);
-	MilkyWayMesh.push(mesh1);
 	//MilkyWayMesh.push(mesh2);
 	//MilkyWayMesh.push(mesh3);
+
+	MilkyWayMesh.push(mesh1);
 	MilkyWayMesh.push(mesh4);
 	MilkyWayMesh.push(mesh5);
+
 	MilkyWayMesh.push(M83mesh);
 
 	var m83fac = 4.;
