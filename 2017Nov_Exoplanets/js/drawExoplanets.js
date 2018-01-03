@@ -32,7 +32,6 @@ function drawExoplanets()
 
 	for (var i=0; i<exoplanets.x.length; i++){
 
-if (exoplanets.name[i] == "TRAPPIST-1") console.log(exoplanets.ringInfo[i])
 //Mark had to combine to numbers a separate at the decimal because of the limitations in Uniview.  I'm using his same input for now, so I will do the same here.
 //if there is no distance known, the ringInfo will be negative
 		ringTot = parseInt(Math.floor(Math.abs(exoplanets.ringInfo[i])));

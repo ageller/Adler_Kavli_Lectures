@@ -17,6 +17,7 @@
 //why do some of the exoplanets not show any planet in Orery mode? see the ROXs
 //allow user to cancel/stop tour (maybe by clickin on the tour again?)
 
+//Note: TRAPPIST-1 only shows 6 planets because the outer one is marked "controversial"
 function animate(time) {
 	requestAnimationFrame( animate );
 	update(time);
@@ -27,11 +28,20 @@ function animate(time) {
 
 function update(time){
 	keyboard.update();
-	if ( keyboard.down("C") ) 
-	{	  
+	if ( keyboard.down("C") ) {	  
 		console.log(camera.position, camera.rotation)
 	}
-	
+
+	if ( keyboard.down("Q") ) {
+        helpMessage=!helpMessage;
+        if (helpMessage){
+            showSplash();
+        }
+        else{
+            hideSplash()
+        }
+    }
+
 	controls.update();
 	TWEEN.update(time);
 	SunMesh.material.uniforms.cameraCenter.value = camera.position;

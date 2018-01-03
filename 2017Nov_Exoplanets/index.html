@@ -9,7 +9,6 @@
 		<script src="resources/three.min.js"></script>
 		<script src="resources/dat.gui.js"></script>
 		<script src="resources/Detector.js"></script>
-		<script src="resources/OrbitControls.js"></script>
 		<script src="resources/TrackballControls.js"></script>
 		<script src="resources/KeyboardState.js"></script>
 		<script src="resources/THREEx.FullScreen.js"></script>
@@ -24,16 +23,36 @@
 <!-- tween -->
 	<script src="resources/Tween.js"></script>
 
-<!-- loading spinner, but change this to loading bar? -->
-<!--    <script src="resources/spin.min.js"></script> -->
 
 	</head>
 
-	<body onload="WebGLStart()">
+	<body>
 
     	<div id='loader' style="background-color:black; position:absolute; top:0; bottom:0; left:0; right:0;" ></div>
 
 		<div id="ContentContainer" style="position: absolute; left:0px; top:0px"></div>
+
+
+			<div id="splash">
+				<div id="splashdiv1">Title here </div>
+				<div id="splashdiv2">Subtitle here</div>
+				<div id="splashdiv3">Adler Planetarium / Aaron Geller / Mark SubbaRao</div>
+				<div id="splashdiv4">
+					<p><b>Instructions:</b></p>
+						<ul>
+							<li>Use the mouse wheel to zoom in and out. Click and drag to move around. </li>
+							<li>Use the user interface in the upper right to control your experience.</li>
+							<li>ADD MORE INSTRUCTIONS HERE </li>
+							<li>Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a> </li>
+							<li><b>q</b>: toggles this screen on and off. </li>
+						</ul>
+
+					<p><b>Choose your Adventure:</b></p>
+				</div>
+
+				<div id="splashdiv5"></div> <!-- filled in after data loads within utils.js -->
+			</div>
+
 
 		<!-- shaders -->
 	    <script src="shaders/vertex.glsl.js"></script>
@@ -49,32 +68,18 @@
 
 		<!-- the main attraction -->
 		<script src="js/utils.js"></script>
-		<script src="js/init.js"></script>
 		<script src="js/drawSun.js"></script>
 		<script src="js/drawSolarSystemPlanets.js"></script>
 		<script src="js/drawHZ.js"></script>
 		<script src="js/drawMilkyWay.js"></script>
 		<script src="js/drawExoplanets.js"></script>
 		<script src="js/renderAll.js"></script>
+		<script src="js/init.js"></script>
 
 
 	</body>
 
-<!-- load the data -->
-<!--	<script src="js/startspinner.js"></script> -->
-	<script src="data/planets.json"></script>
-	<script src="data/Sunevol_b0.1.binned.json"></script>
-	<script src="data/SSevol_b0.1_Mercury.binned.json"></script>
-	<script src="data/SSevol_b0.1_Venus.binned.json"></script>
-	<script src="data/SSevol_b0.1_Earth.binned.json"></script>
-	<script src="data/SSevol_b0.1_Mars.binned.json"></script>
-	<script src="data/SSevol_b0.1_Jupiter.binned.json"></script>
-	<script src="data/SSevol_b0.1_Saturn.binned.json"></script>
-	<script src="data/SSevol_b0.1_Uranus.binned.json"></script>
-	<script src="data/SSevol_b0.1_Neptune.binned.json"></script>
-	<script src="data/SSevol_b0.1_Pluto.binned.json"></script>
-	<script src="data/HZevol_b0.1.binned.json"></script>
-	<script src="data/OpenExoplanetCatalog_Nov2017.json"></script>
+
 
 
 </html>

@@ -1,5 +1,4 @@
-//from Allen's Astrophysical Quantities; Note, I changed Earth's year to be exactly 1 so there isn't any confusion in the visualization. The true value is 0.99997862
-planets = [
+[
 {"name":"Mercury",   "semi_major_axis":0.38709893,   "eccentricity":0.20563069,  "inclination":7.00487,  "longitude_of_ascending_node":48.33167,   "argument_of_periapsis":29.12478,  "period":0.24084445,  "tperi":2451149.5},
 {"name":"Venus",     "semi_major_axis":0.72333199,   "eccentricity":0.00677323,  "inclination":3.39471,  "longitude_of_ascending_node":76.68069,   "argument_of_periapsis":54.85229,  "period":0.61518257,  "tperi":2451063.5},
 {"name":"EarthMoon", "semi_major_axis":1.0000011,    "eccentricity":0.01671022,  "inclination":0.00005,  "longitude_of_ascending_node":-11.26064,  "argument_of_periapsis":114.20783, "period":1.0,  "tperi":2450817.5},
