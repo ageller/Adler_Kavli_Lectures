@@ -4,10 +4,8 @@ function CameraDistance(origin = new THREE.Vector3(0., 0., 0.)){
 }
 
 
-//check if the data is loaded
+//after the data is loaded, include the buttons
 function clearloading(){
-    // stop spin.js loader
-    //spinner.stop();
 
     d3.select("#ContentContainer").style("visibility","visible")
 
@@ -16,6 +14,7 @@ function clearloading(){
     d3.select("#loader").style("display","none")
 
     var buttons = d3.select("#splashdiv5");
+    buttons.select("#loader").remove();
 
 	buttons.append('button')
 		.attr('class', 'splashButton')
@@ -25,7 +24,6 @@ function clearloading(){
 		.attr('class', 'splashButton')
 		.attr('onclick','runSSEvol()')
 		.html('Solar System Evolution');
-
 }
 function runExop(){
 	showExoplanetGUI = true; 
@@ -34,7 +32,7 @@ function runExop(){
 	if (!exoplanetsON){
 		params.ShowHideExoplanets()
 	}
-	hideSplash();
+	hideSplash("#splash");
 	controls.maxDistance = 1.e10;
 
 }
@@ -45,43 +43,38 @@ function runSSEvol(){
 	if (exoplanetsON){
 		params.ShowHideExoplanets()
 	}
-	hideSplash();
+	hideSplash("#splash");
 	controls.maxDistance = 500;
 
 }
 
 //hide the splash screen
-function hideSplash(){
-    if (loaded){
-        helpMessage = 0;
-        var fdur = 700.;
+function hideSplash(id){
 
-        var splash = d3.select("#splash");
+    var fdur = 700.;
 
-        splash.transition()
-            .ease(d3.easeLinear)
-            .duration(fdur)
-            .style("opacity", 0)
+    var splash = d3.select(id);
 
-            .on("end", function(d){
-                splash.style("display","none");
-            })
-    }
+    splash.transition()
+        .ease(d3.easeLinear)
+        .duration(fdur)
+        .style("opacity", 0)
+
+        .on("end", function(d){
+            splash.style("display","none");
+        })
 }
-
 //show the splash screen
-function showSplash(){
-    if (loaded){
-        helpMessage = 1;
-        var fdur = 700.;
+function showSplash(id, op = 0.8){
 
-        var splash = d3.select("#splash");
-        splash.style("display","block");
+    var fdur = 700.;
 
-        splash.transition()
-            .ease(d3.easeLinear)
-            .duration(fdur)
-            .style("opacity", 0.8);
-    }
-    
+    var splash = d3.select(id);
+    splash.style("display","block");
+
+    splash.transition()
+        .ease(d3.easeLinear)
+        .duration(fdur)
+        .style("opacity", op);
+
 }

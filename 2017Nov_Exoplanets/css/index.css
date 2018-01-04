@@ -7,6 +7,13 @@ canvas{
 	height: 100% 
 }
 
+a{
+    color: #FFF008;
+}
+a:visited{
+    color: #FFF008;
+} 
+
 #splash{
 	position:absolute; 
 	top:0; 
@@ -48,8 +55,8 @@ canvas{
 }
 #splashdiv4 {
 	font-size:10px;
-	font-size:2vmin;
-	text-align: left;
+	font-size:3vmin;
+	/*text-align: left;*/
 	margin:0;
 	padding:0;
 	padding-top:5vmin;
@@ -59,7 +66,7 @@ canvas{
 }
 #splashdiv5 {
 	font-size:10px;
-	font-size:2vmin;
+	font-size:6vmin;
 	margin:0;
 	padding:0;
 	padding-top:5vmin;
@@ -79,8 +86,31 @@ canvas{
     transition-duration: 0.4s;
     cursor: pointer;
 }
-
 .splashButton:hover {
     background-color: black;
     color: white;
+}
+
+/* https://codepen.io/chrisnager/pen/yfwgE */
+@keyframes blink {50% { color: transparent }}
+.loader__dot { animation: 1s blink infinite }
+.loader__dot:nth-child(2) { animation-delay: 250ms }
+.loader__dot:nth-child(3) { animation-delay: 500ms }
+
+#instructionsDiv {
+	border: 2px solid #FFF008;
+	height:90%;
+	width:450px;
+	position:absolute; 
+	top:5px; 
+	left:5px;
+	z-index:4;
+	margin:0;
+	padding:10px;
+	color:white;
+	background-color:black;
+	font-family: Sans-Serif;
+	text-align: left;
+	font-size:16px;
+	opacity: 0.9;
 }

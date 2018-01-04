@@ -77,8 +77,6 @@ function drawSun()
 		alphaTest: true,
 	} );
 
-	//var material = new THREE.MeshBasicMaterial( { color: 'yellow'});
-	//var material = new THREE.MeshLambertMaterial( { color: 'yellow' } );
 	var mesh = new THREE.Mesh( geometry, SunMaterial );
 	mesh.position.set(0,0,0);
 	scene.add(mesh);

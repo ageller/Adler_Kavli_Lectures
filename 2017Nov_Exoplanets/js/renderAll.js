@@ -1,47 +1,33 @@
-//length units are in AU
-
-//TODO : 
-//check the orientation of Solar System relative to Kepler field  (and also confirm that I have the origin correct for exoplanets)
-//make Sun fade out at large cameraDistance, and also bigger when at mid range distances (OK for evolves Sun, maybe need some lower limit)
-//check solar system orbit direction and relative positions of planets.
-//labels for the different colors, and tooltips?
-//make corona not leave a line over the HZ and orbit lines when very large?
-//can I use the alphaMap for the exoplanets (rather than taper)? Fix how it plots on top of HZ
-//can I shrink the file size of the textures?
-//add credits for the textures
-//improve the Galaxy -- and how it matches to the image
-//loading screen (including waiting for textures to load)
-//fog for exoplanets?
-//turn on/off for Galaxy and exoplanets with Myr timescales?
-//fix the "blink" of the centered exoplanet when you switch to a new exoplanet
-//why do some of the exoplanets not show any planet in Orery mode? see the ROXs
-//allow user to cancel/stop tour (maybe by clickin on the tour again?)
-
 //Note: TRAPPIST-1 only shows 6 planets because the outer one is marked "controversial"
 function animate(time) {
 	requestAnimationFrame( animate );
 	update(time);
 	render();
 
-	//console.log(camera.position, camera.rotation);
 }
 
 function update(time){
 	keyboard.update();
-	if ( keyboard.down("C") ) {	  
-		console.log(camera.position, camera.rotation)
-	}
 
 	if ( keyboard.down("Q") ) {
-        helpMessage=!helpMessage;
-        if (helpMessage){
-            showSplash();
+        splashMessage=!splashMessage;
+        if (splashMessage){
+            showSplash("#splash");
         }
         else{
-            hideSplash()
+            hideSplash("#splash");
         }
     }
 
+	if ( keyboard.down("I") ) {
+        helpMessage=!helpMessage;
+        if (helpMessage){
+            showSplash("#instructionsDiv", op = 0.9);
+        }
+        else{
+            hideSplash("#instructionsDiv");
+        }
+    }
 	controls.update();
 	TWEEN.update(time);
 	SunMesh.material.uniforms.cameraCenter.value = camera.position;
@@ -82,11 +68,6 @@ function render() {
 
 
 
-	//update the thickness of the orbit lines based on the camera position
-	//orbitLines.forEach( function( l, i ) {
-	//	l.material.uniforms.lineWidth.value = Math.min(camDist * lineWidthfac, 1000);
-	//});
-
 	//make sure that the billboards are always looking at the camera
 	updateBillboards();
 
@@ -100,10 +81,6 @@ function render() {
 		width = height * camera.aspect;  
 		coronaMesh.scale.x = width/width0;
 		coronaMesh.scale.y = height/height0;
-		//coronaMesh.scale.z = cScale;
-
-
-
 	}
 
 
@@ -133,11 +110,6 @@ function render() {
 					l.material.uniforms.exopAlpha.value = Math.min(params.exopAlpha, exopDfac/camDist);
 				}
 
-				//if (i == 0){
-				//	console.log(dist, width, l.material.uniforms.size.value/width)
-				//}
-				//l.scale.x =  escalefac;
-				//l.scale.y =  escalefac;
 			}
 		});
 	}

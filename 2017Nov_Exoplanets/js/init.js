@@ -20,7 +20,7 @@ var coronaMesh;
 var SuniEvol = 0;
 var HZMesh;
 var MilkyWayMesh = [];
-var M83mesh;
+var MWTexmesh;
 var MWInnerMesh;
 var exoplanetsMesh = [];
 var exoplanetsMatrix = [];
@@ -38,7 +38,7 @@ var maxTime = 0.;
 var SunR0;
 var iLength;
 var bbTex;
-var M83Tex;
+var MWTex;
 var ESOMWTex;
 
 var camDist = 1.;
@@ -110,7 +110,8 @@ var planets = null;
 showExoplanetGUI = false;
 showSolarSystemEvolGUI = false;
 
-helpMessage = 1;
+splashMessage = true;
+helpMessage = false;
 
 function init() {
 	// scene
@@ -157,11 +158,6 @@ function init() {
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 
 	// controls
-	//controls = new THREE.OrbitControls( camera, renderer.domElement );
-	//controls.minDistance = 2.;
-	//controls.enableDamping = true;
-	//controls.dampingFactor = params.friction;
-	//controls.zoomSpeed = params.zoomSpeed;
 	controls = new THREE.TrackballControls( camera, renderer.domElement );
 	controls.minDistance = 2.;
 	controls.maxDistance = 1.e10;
@@ -169,29 +165,20 @@ function init() {
 	controls.dynamicDampingFactor = params.friction;
  	controls.zoomSpeed = params.zoomSpeed;
 
-	// light
-	//var light = new THREE.PointLight(0xffffff);
-	//light.position.set(100,250,100);
-	//scene.add(light);
-
 	//load in the textures
 
 	//black body texture
 	bbTex = new THREE.TextureLoader().load( "textures/bb.png" );
 	bbTex.minFilter = THREE.LinearFilter;
 
-	//M83 galaxy : https://apod.nasa.gov/apod/ap151008.html
-	//M83Tex = new THREE.TextureLoader().load( "textures/gendlerM83-New-HST-ESO-LL.png" );
 	//Milky Way illustration: https://commons.wikimedia.org/wiki/File:Milky_Way_Galaxy.jpg
-	M83Tex = new THREE.TextureLoader().load("textures/2048px-Milky_Way_Galaxy.png");
-	M83Tex.minFilter = THREE.LinearFilter;
+	MWTex = new THREE.TextureLoader().load("textures/2048px-Milky_Way_Galaxy.png");
+	MWTex.minFilter = THREE.LinearFilter;
 
 	//ESO equirectangle MW texture: https://www.eso.org/public/usa/images/eso0932a/
 	ESOMWTex = new THREE.TextureLoader().load("textures/eso0932a.jpg" );
 	ESOMWTex.minFilter = THREE.LinearFilter;
 
-	//aTex = new THREE.TextureLoader().load( "textures/alphaFade.png" );
-	//aTex.minFilter = THREE.LinearFilter;
 
 	//stereo
 	effect = new THREE.StereoEffect( renderer );
@@ -371,7 +358,6 @@ function defineParams(){
 		};
 //Galaxy controls
 		this.MWalpha = 1.;
-		this.M83alpha = 1.;
 		this.ShowHideMilkyWay = function() {
 			checkController = getController(basicGUI, params, "ShowHideMilkyWay");
 			if (checkController != null){
@@ -500,15 +486,7 @@ function defineParams(){
 
         }
         this.updateExoplanets = function() {
-/*        	if (!exoplanetsInTweening && !exoplanetsInMotion){
-				if (exopAlphaTweenValue.value == 0){
-					exopAlphaTween.to({"value":params.exopAlpha})
-				} 
-				if (exopAlphaTweenValue.value = params.exopAlpha){
-					exopAlphaTween.to({"value":0});
-				}
-			}
-*/
+
 			exoplanetsMesh.forEach( function( e, i ) {
 				e.material.uniforms.colorMode.value = params.exopColorMode;
 				e.material.uniforms.markerMode.value = params.exopMarkerMode;
@@ -574,27 +552,6 @@ function defineParams(){
 			}
 			params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs)*1.e6, 2017);
 
-			/*
-			if (params.futureMillionYrs > 1){
-				if (exoplanetsON){
-					if (!exoplanetsInTweening) params.ShowHideExoplanets();
-					exoplanetsOFFtime = true;
-				}
-				if (MilkyWayON){
-					if (!MWInTweening) params.ShowHideMilkyWay();
-					MWOFFtime = true;
-				}
-			} else {
-				if (!exoplanetsON && exoplanetsOFFtime){
-					if (!exoplanetsInTweening) params.ShowHideExoplanets();
-					exoplanetsOFFtime = false;
-				}
-				if (!MilkyWayON && MWOFFtime){
-					if (!MWInTweening) params.ShowHideMilkyWay();
-					MWOFFtime = false;
-				}
-			}
-	*/
 			params.updateSolarSystem();
 			params.updateExoplanets();
 		}
@@ -653,18 +610,20 @@ function defineGUI(){
 	basicGUI.add( params, 'ShowHideMilkyWay').name("Show/Hide Milky Way");
 
 	if (showExoplanetGUI){
-		basicGUI.add( params, 'exopColorMode',{ "DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3 } ).onChange( params.updateLegend ).name("Exoplanet Marker Color");
-		basicGUI.add( params, 'exopMarkerMode',{ "BullsEye": 1, "Orrery": 2} ).onChange( params.updateExoplanets ).name("Exoplanet Marker Type");
+		basicGUI.add( params, 'exopColorMode',{ "Discovery Method": 1, "Planet Size": 2, "Habitable Zone": 3 } ).onChange( params.updateLegend ).name("Exoplanet Marker Color");
+		basicGUI.add( params, 'exopMarkerMode',{ "Bulls-Eye": 1, "Orrery": 2} ).onChange( params.updateExoplanets ).name("Exoplanet Marker Type");
 	}
 
 	basicGUI.open()
 
 //tours
 	var toursGUI = gui.addFolder('Tours');
-	toursGUI.add( params, 'MilkyWayView').name("Go To Milky Way View");
+	if (showExoplanetGUI){
+		toursGUI.add( params, 'MilkyWayView').name("Go To Milky Way View");
+	}
 	toursGUI.add( params, 'SolarSystemView').name("Go To Solar System View");
 	if (showSolarSystemEvolGUI){
-		toursGUI.add( params, 'FutureSolarSystem').name("Animate Future Life of Solar System");
+		toursGUI.add( params, 'FutureSolarSystem').name("Animate Future of Solar System");
 	}
 	if (showExoplanetGUI){
 		toursGUI.add( params, 'KeplerView').name("Go To Kepler View");

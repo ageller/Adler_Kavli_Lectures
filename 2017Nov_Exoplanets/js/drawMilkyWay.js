@@ -80,9 +80,8 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 function drawMilkyWay()
 {
 
-	var scaleUp = AUfac*1.2e4;//AUfac*3e4; //milky way radius in pc converted to AU
+	var scaleUp = AUfac*1.2e4;//AUfac*3e4; //milky way radius in pc converted to AU //I scale everything by a factor of 4 below for some reason
 	var center = new THREE.Vector3(8500.*AUfac, 0., 0.);
-	//var center = new THREE.Vector3(0., 0., 0.);
 
 	var radius = 1.2;
 	var scaleHeight = 0.1;
@@ -95,78 +94,6 @@ function drawMilkyWay()
 	var Ssize = 0.5; //size of star points
 	var dfac = 4; //decrease in size of star points with distance from center (to help make bulge brighter)
 
-	//blue disk
-/*	var disk = createDisk(500, 1.8*radius, scaleHeight);
-	var sized = 20.*scaleUp;
-	var diskMaterial = new THREE.ShaderMaterial( { 
-		uniforms: {
-			color: {value: new THREE.Vector4( 0.2,  0.2,  0.4, 0.04)},
-			size: {value: sized},
-			dfac: {value: 0},
-			radius: {value: 0},
-			MWalpha: {value: params.MWalpha },
-		},
-
-		vertexShader: MWVertexShader,
-		fragmentShader: MWFragmentShader,
-		depthWrite:false,
-		depthTest: false,
-		transparent:true,
-		alphaTest: false,
-		//blending:THREE.AdditiveBlending,
-	} );
-	var meshd = new THREE.Points(disk, diskMaterial);
-	meshd.position.set(center.x, center.y, center.z);
-*/
-	//bar
-/*	var bar = createSpiralGalaxy(2, -100., radius, scaleHeight, 0.15, N, B, Nbar = 10); //yellow
-	var sizeb = 20.*scaleUp;
-	var barMaterial = new THREE.ShaderMaterial( { 
-		uniforms: {
-			color: {value: new THREE.Vector4( 0.3,  0.3,  0.0, 0.3)},
-			size: {value: sizeb},
-			radius: {value: 0.},
-			dfac: {value: 0},
-			MWalpha: {value: params.MWalpha },
-
-		},
-
-		vertexShader: MWVertexShader,
-		fragmentShader: MWFragmentShader,
-		depthWrite:false,
-		depthTest: false,
-		transparent:true,
-		alphaTest: false,
-		blending:THREE.AdditiveBlending,
-	} );
-	var meshb = new THREE.Points(bar, barMaterial);
-	meshb.position.set(center.x, center.y, center.z);
-*/
-
-	//general blue background
-/*	var galaxy0= createSpiralGalaxy(2, 1000, radius, scaleHeight, 0.5, N, B, Nbar = -1., radmax=1.5); //blue
-	var size0 = 3.*scaleUp;
-	var galaxy0Material = new THREE.ShaderMaterial( { 
-		uniforms: {
-			color: {value: new THREE.Vector4( 0.2,  0.2,  0.4, 0.1)},
-			size: {value: size0},
-			dfac: {value: 0.},
-			radius: {value: 0.},
-			MWalpha: {value: params.MWalpha },
-
-		},
-
-		vertexShader: MWVertexShader,
-		fragmentShader: MWFragmentShader,
-		depthWrite:false,
-		depthTest: false,
-		transparent:true,
-		alphaTest: false,
-		blending:THREE.AdditiveBlending,
-	} );
-	var mesh0 = new THREE.Points(galaxy0, galaxy0Material);
-	mesh0.position.set(center.x, center.y, center.z);
-*/
 
 	var galaxy1 = createSpiralGalaxy(2, 1000, radius, scaleHeight, 0.5, N*fac3, B*fac3, armsRot = armsRot, Nbar = -1., radmax=1.5); //blue
 	var size1 = 3.*scaleUp;
@@ -191,15 +118,15 @@ function drawMilkyWay()
 	var mesh1 = new THREE.Points(galaxy1, galaxy1Material);
 	mesh1.position.set(center.x, center.y, center.z);
 
-	//red star forming regions
-/*	var galaxy2 = createSpiralGalaxy(4, 100, radius, scaleHeight, 0.15, N, B,  Nbar = 50); //red
+	//white stars
+	var galaxy2 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N, B, armsRot = armsRot, Nbar = 50, radmax = 1.2); 
 	var size2 = Ssize*scaleUp;
 	var galaxy2Material = new THREE.ShaderMaterial( { 
 		uniforms: {
-			color: {value: new THREE.Vector4(1., 0.3, 0.3, 0.5)},
+			color: {value: new THREE.Vector4(1., 1., 1., 0.5)},
 			dfac: {value: dfac},
 			size: {value: size2},
-			radius: {value: 0},
+			radius: {value: 0.},
 			MWalpha: {value: params.MWalpha },
 		},
 
@@ -215,16 +142,17 @@ function drawMilkyWay()
 	var mesh2 = new THREE.Points(galaxy2, galaxy2Material);
 	mesh2.position.set(center.x, center.y, center.z);
 
-	//red star forming regions, for the second set of arms
-	var galaxy3 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N*fac3*0.6, B*fac3*0.9, Nbar = 50); //red
+	//white stars
+	var galaxy3 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N*fac3*0.6, B*fac3*0.9, armsRot = armsRot,  Nbar = 50, radmax = 1.2); 
 	var size3 = Ssize*scaleUp;
 	var galaxy3Material = new THREE.ShaderMaterial( { 
 		uniforms: {
-			color: {value: new THREE.Vector4(1., 0.3, 0.3, 0.5)},
+			color: {value: new THREE.Vector4(1., 1., 1., 0.5)},
 			dfac: {value: dfac},
 			size: {value: size3},
 			radius: {value: 0.},
 			MWalpha: {value: params.MWalpha },
+
 		},
 
 		vertexShader: MWVertexShader,
@@ -238,68 +166,19 @@ function drawMilkyWay()
 	} );
 	var mesh3 = new THREE.Points(galaxy3, galaxy3Material);
 	mesh3.position.set(center.x, center.y, center.z);
-*/
-	//white stars
-	var galaxy4 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N, B, armsRot = armsRot, Nbar = 50, radmax = 1.2); 
-	var size4 = Ssize*scaleUp;
-	var galaxy4Material = new THREE.ShaderMaterial( { 
-		uniforms: {
-			color: {value: new THREE.Vector4(1., 1., 1., 0.5)},
-			dfac: {value: dfac},
-			size: {value: size4},
-			radius: {value: 0.},
-			MWalpha: {value: params.MWalpha },
-		},
 
-		vertexShader: MWVertexShader,
-		fragmentShader: MWFragmentShader,
-		depthWrite:false,
-		depthTest: false,
-		transparent:true,
-		alphaTest: false,
-		blending:THREE.AdditiveBlending,
-
-	} );
-	var mesh4 = new THREE.Points(galaxy4, galaxy4Material);
-	mesh4.position.set(center.x, center.y, center.z);
-
-	//white stars
-	var galaxy5 = createSpiralGalaxy(4, 75, radius, scaleHeight, 0.15, N*fac3*0.6, B*fac3*0.9, armsRot = armsRot,  Nbar = 50, radmax = 1.2); 
-	var size5 = Ssize*scaleUp;
-	var galaxy4Material = new THREE.ShaderMaterial( { 
-		uniforms: {
-			color: {value: new THREE.Vector4(1., 1., 1., 0.5)},
-			dfac: {value: dfac},
-			size: {value: size4},
-			radius: {value: 0.},
-			MWalpha: {value: params.MWalpha },
-
-		},
-
-		vertexShader: MWVertexShader,
-		fragmentShader: MWFragmentShader,
-		depthWrite:false,
-		depthTest: false,
-		transparent:true,
-		alphaTest: false,
-		blending:THREE.AdditiveBlending,
-
-	} );
-	var mesh5 = new THREE.Points(galaxy5, galaxy4Material);
-	mesh5.position.set(center.x, center.y, center.z);
-
-	//M83 in the background
+	//MW image in the background
 	var geometry = new THREE.PlaneGeometry(1., 1.);
-	var M83Material =  new THREE.ShaderMaterial( {
+	var MWMaterial =  new THREE.ShaderMaterial( {
 		uniforms: {
-			tex: { type: "t", value: M83Tex},
+			tex: { type: "t", value: MWTex},
 			MWalpha: {value: params.MWalpha },
-			M83alpha: {value: params.M83alpha },
+			MWTexalpha: {value: 1. },
 
 		},
 
 		vertexShader: myVertexShader,
-		fragmentShader: M83FragmentShader,
+		fragmentShader: MWTexFragmentShader,
 		depthWrite:false,
 		depthTest: false,
 		side: THREE.DoubleSide, 
@@ -307,28 +186,22 @@ function drawMilkyWay()
 		alphaTest: false,
 
 	} );
-	M83mesh = new THREE.Mesh( geometry, M83Material );
-	M83mesh.position.set(center.x, center.y, center.z);
+	MWTexmesh = new THREE.Mesh( geometry, MWMaterial );
+	MWTexmesh.position.set(center.x, center.y, center.z);
 
-
-	//MilkyWayMesh.push(meshd);
-	//MilkyWayMesh.push(meshb);
-	//MilkyWayMesh.push(mesh0);
-	//MilkyWayMesh.push(mesh2);
-	//MilkyWayMesh.push(mesh3);
 
 	MilkyWayMesh.push(mesh1);
-	MilkyWayMesh.push(mesh4);
-	MilkyWayMesh.push(mesh5);
+	MilkyWayMesh.push(mesh2);
+	MilkyWayMesh.push(mesh3);
 
-	MilkyWayMesh.push(M83mesh);
+	MilkyWayMesh.push(MWTexmesh);
 
-	var m83fac = 4.;
+	var MWfac = 4.;
 	MilkyWayMesh.forEach( function( m, i ) {
 		MWscene.add(m)
 		m.scale.set(scaleUp, scaleUp, scaleUp);
 		if (i == (MilkyWayMesh.length - 1)){
-			m.scale.set(m83fac*scaleUp, m83fac*scaleUp, m83fac*scaleUp);
+			m.scale.set(MWfac*scaleUp, MWfac*scaleUp, MWfac*scaleUp);
 		} 
 	});
 

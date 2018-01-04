@@ -32,26 +32,45 @@
 		<div id="ContentContainer" style="position: absolute; left:0px; top:0px"></div>
 
 
-			<div id="splash">
-				<div id="splashdiv1">Explore our Solar System and Exoplanets </div>
-				<div id="splashdiv2">Interactive Content from Dr. Lisa Kaltenegger's Kavli Lecture</div>
-				<div id="splashdiv3">Adler Planetarium / Aaron Geller / Mark SubbaRao</div>
-				<div id="splashdiv4">
-					<p><b>Instructions:</b></p>
-						<ul>
-							<li>ADD MORE INSTRUCTIONS HERE </li>
-							<li>Use the mouse wheel to zoom in and out. Click and drag to move around. </li>
-							<li>Use the user interface in the upper right to control your experience.</li>
-							<li>Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a> </li>
-							<li><b>q</b>: toggles this screen on and off. </li>
-						</ul>
+		<div id="splash">
+			<div id="splashdiv1">Explore our Solar System and Exoplanets </div>
+			<div id="splashdiv2">Interactive Content from Dr. Lisa Kaltenegger's Kavli Lecture</div>
+			<div id="splashdiv3">Adler Planetarium / Aaron Geller / Mark SubbaRao</div>
+			<div id="splashdiv4">
+				<p>For instruction, <a href="javascript:showSplash('#instructionsDiv', op = 0.9); helpMessage=true;">click here</a>, or press " i " anytime.  <br/>To display this screen anytime, press " q ".</p>
 
-					<p><b>Choose your Adventure:</b></p>
-				</div>
-
-				<div id="splashdiv5"></div> <!-- filled in after data loads within utils.js -->
+				<p>Choose your Adventure:</p>
 			</div>
 
+			<div id="splashdiv5">
+				<div id="loader">Loading</text><span class="loader__dot">.</span><span class="loader__dot">.</span><span class="loader__dot">.</div>
+			</div> <!-- buttons appear after data loads within utils.js -->
+
+		</div>
+
+		<div id="instructionsDiv" style="display:none; opacity:0">
+			<div style="margin-bottom:10px">
+				<div style="top:0; left:0; color:#FFF008;"><a style="text-decoration: none;" href="javascript:hideSplash('#instructionsDiv'); helpMessage=false;">X</a></div>
+				<div style="top:0; left:10%; font-size:30px; position:absolute">Instructions</div>
+			</div>
+			<div style="overflow-y:scroll; height:90%">
+				<p>This WebGL interactive application allows you to explore content that we premiered in the Adler Planetarium's Grainger Sky Theater dome during the Kavli Lecture by Lisa Kaltenegger on November 3 & 4, 2017.  You are free to explore the data displayed here on your own.  We also provide two different adventures to guide your exploration: Exoplanet Discoveries and the Evolution of our Solar System (available from the yellow buttons on the entry screen).</p>
+
+				<p> The Exoplanet Discoveries adventure allows you to view all of the known exoplanets, up through Nov. 2017, drawn from <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>. The menu on the right, has many options to explore the data.  For instance, the "Exoplanet Marker Color" allows you to view the exoplanets by discovery method, or planet size, or those in the habitable zone.  Try changing the "Exoplanet Marker Type" to "Orrery" and setting the "Time Step Unit" to "Day".  Also, be sure to go through all the "Tours"!</p>
+
+				<p> The Solar System Evolution adventure shows you the future changes that our Sun and Solar System will undergo over the next, nearly 9 billion years.  You can use the "Tour" to watch the future of our Solar System, or use controls to move through the times.  (Please note that the background image of the Galaxy would change in reality over these many millions of years, but is held constant here.)</p>
+
+				<p>Other general instructions</p>
+				<ul>
+					<li>Use the mouse wheel to zoom in and out. Click and drag to move around. </li>
+					<li>Use the user interface in the upper right to control your experience.</li>
+					<li>Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a> </li>
+					<li>Type " i "  to toggle this screen on and off. </li>
+				</ul>
+
+				<p>This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software.  </p>
+			</div>
+		</div>
 
 		<!-- shaders -->
 	    <script src="shaders/vertex.glsl.js"></script>
@@ -63,7 +82,7 @@
 	    <script src="shaders/SunFragment.glsl.js"></script>
 	    <script src="shaders/exoplanetFragment.glsl.js"></script>
 	    <script src="shaders/MWFragment.glsl.js"></script>
-	    <script src="shaders/M83Fragment.glsl.js"></script>
+	    <script src="shaders/MWTexFragment.glsl.js"></script>
 
 		<!-- the main attraction -->
 		<script src="js/utils.js"></script>
