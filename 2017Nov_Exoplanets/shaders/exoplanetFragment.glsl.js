@@ -48,38 +48,49 @@ void main()
 	if (colorMode == 2){
 		if (mClass == 0){ //smaller
 			markerColor=vec4(1.0,0.2,1.0,1);
-			planetSize=0.5;
 		}
 		if (mClass == 1){//Earth sized
 			markerColor=vec4(0.2,0.2,1.0,1);
-			planetSize=1.0;
 		}
 		if (mClass == 2){//Super Earth sized
 			markerColor=vec4(0.0,1.0,0.0,1);
-			planetSize=1.5;
 		}
 		if (mClass == 3){//Neptune Sized
 			markerColor=vec4(1.0,1.0,0.2,1);
-			planetSize=2.0;
 		}
 		if (mClass == 4){//Jupiter Sized
 			markerColor=vec4(1.0,0.5,0.0,1);
-			planetSize=3.0;
 		}
 		if (mClass == 5){//larger
 			markerColor=vec4(0.5,0.5,0.5,1);
-			planetSize=4.0;
 		}
 	}
 	if (colorMode == 3){ //habitable zone
 		if (habitable == 1) {
 			markerColor=vec4(0.2,0.2,1,1);
-			planetSize=1.0;
 		} else {
-			markerColor=vec4(0.5);
+			markerColor=vec4(vec3(0.5), 1.);
 		}
 	}
 
+	if (mClass == 0){ //smaller
+		planetSize=0.5;
+	}
+	if (mClass == 1){//Earth sized
+		planetSize=1.0;
+	}
+	if (mClass == 2){//Super Earth sized
+		planetSize=1.5;
+	}
+	if (mClass == 3){//Neptune Sized
+		planetSize=2.0;
+	}
+	if (mClass == 4){//Jupiter Sized
+		planetSize=3.0;
+	}
+	if (mClass == 5){//larger
+		planetSize=4.0;
+	}
 
 	float r = dist;
 
@@ -99,6 +110,9 @@ void main()
 		vec4 color = vec4(vec3(0.5),0.0);
 		if (r < (dS+drawWidth) && r > (dS-drawWidth)){
 			color.a = 1.;
+			if (colorMode == 3){
+				color.rgb = markerColor.rgb + 0.1;
+			}
 		}
 		//if (r > dS && r < (dS+drawWidth)){
 		//	color.a = smoothstep(dS+drawWidth, dS, r);
