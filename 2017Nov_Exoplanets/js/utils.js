@@ -24,7 +24,12 @@ function clearloading(){
 		.attr('class', 'splashButton')
 		.attr('onclick','runSSEvol()')
 		.html('Solar System Evolution');
+	buttons.append('button')
+		.attr('class', 'splashButton')
+		.attr('onclick','runFree()')
+		.html('Free Exploration');
 }
+
 function runExop(){
 	showExoplanetGUI = true; 
 	showSolarSystemEvolGUI = false; 
@@ -45,6 +50,29 @@ function runSSEvol(){
 	}
 	hideSplash("#splash");
 	controls.maxDistance = 500;
+
+}
+function runFree(){
+	showExoplanetGUI = false; 
+	showSolarSystemEvolGUI = false; 
+	if (gui != null){
+		gui.destroy();
+	}
+	gui = new dat.GUI({ width: 450 } )
+	gui.add(params,'splash').name("Home");
+	gui.add(params,'instructions').name("Help");
+
+	if (!exoplanetsON){
+		params.ShowHideExoplanets()
+	}
+	if (!SolarSystemON){
+		params.ShowHideSolarSystem()
+	}
+	if (!MilkyWayON){
+		params.ShowHideMilkyWay()
+	}
+	hideSplash("#splash");
+	controls.maxDistance = 1.e10;
 
 }
 

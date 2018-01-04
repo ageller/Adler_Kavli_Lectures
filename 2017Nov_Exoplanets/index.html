@@ -37,7 +37,7 @@
 			<div id="splashdiv2">Interactive Content from Dr. Lisa Kaltenegger's Kavli Lecture</div>
 			<div id="splashdiv3">Adler Planetarium / Aaron Geller / Mark SubbaRao / Patrick McPike</div>
 			<div id="splashdiv4">
-				<p>For instruction, <a href="javascript:showSplash('#instructionsDiv', op = 0.9); helpMessage=true;">click here</a>, or press " i " anytime.  <br/>To display this screen anytime, press " q ".</p>
+				<p><a href="javascript:showSplash('#instructionsDiv', op = 0.9); helpMessage=true;">Click here for instructions</a>, or press " i " anytime, or click "Help" on the control panel.  <br/>To display this screen anytime, press " q ", or click "Home" on the control panel.</p>
 
 				<p>Choose your Adventure:</p>
 			</div>
@@ -48,7 +48,7 @@
 
 		</div>
 
-		<div id="instructionsDiv" style="display:none; opacity:0">
+		<div id="instructionsDiv" style="display:none; opacity:0" onclick="hideSplash('#instructionsDiv'); helpMessage=false;">
 			<div style="margin-bottom:10px">
 				<div style="top:0; left:0; color:#FFF008;"><a style="text-decoration: none;" href="javascript:hideSplash('#instructionsDiv'); helpMessage=false;">X</a></div>
 				<div style="top:0; left:10%; font-size:30px; position:absolute">Instructions</div>

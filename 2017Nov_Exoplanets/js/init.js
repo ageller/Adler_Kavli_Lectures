@@ -283,7 +283,7 @@ function makeLegend(type){
 
 function defineParams(){
 
-		ParamsInit = function() {
+	ParamsInit = function() {
 		this.fullscreen = function() { THREEx.FullScreen.request() };
 		this.resetCamera = function() { controls.reset(); 	camera.up.set(0, -1, 0)};
 		this.renderer = null;
@@ -291,6 +291,18 @@ function defineParams(){
 		this.friction = 0.2;
 		this.zoomSpeed = 1.;
 		this.stereoSep = 0.064;
+
+//home screen and instructions
+		this.splash = function(){showSplash("#splash");};
+		this.instructions = function(){
+	       helpMessage=!helpMessage;
+	        if (helpMessage){
+	            showSplash("#instructionsDiv", op = 0.9);
+	        }
+	        else{
+	            hideSplash("#instructionsDiv");
+	        }
+	    };
 
 //for Legend
 		this.noData = [128., 128., 128.]
@@ -586,6 +598,8 @@ function defineGUI(){
 	}
 
 	gui = new dat.GUI({ width: 450 } )
+	gui.add(params,'splash').name("Home");
+	gui.add(params,'instructions').name("Help");
 
 	basicGUI = gui.addFolder('Controller');
 
@@ -913,6 +927,12 @@ function WebGLStart(){
 	initSunInterps();
 	initPlanetInterps();
 	initHZInterps();
+
+//initial GUI
+	gui = new dat.GUI({ width: 450 } )
+	gui.add(params,'splash').name("Home");
+	gui.add(params,'instructions').name("Help");
+
 
 //draw everything
 	drawInnerMilkyWay();
