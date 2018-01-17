@@ -32,44 +32,127 @@
 		<div id="ContentContainer" style="position: absolute; left:0px; top:0px"></div>
 
 
-		<div id="splash">
+		<div id="splash" >
+			<!--
 			<div id="splashdiv1">Explore our Solar System and Exoplanets </div>
 			<div id="splashdiv2">Interactive Content from Dr. Lisa Kaltenegger's Kavli Lecture</div>
 			<div id="splashdiv3">Adler Planetarium / Aaron Geller / Mark SubbaRao / Patrick McPike</div>
 			<div id="splashdiv4">
-				<p><a href="javascript:showSplash('#instructionsDiv', op = 0.9); helpMessage=true;">Click here for instructions</a>, or press " i " anytime, or click "Help" on the control panel.  <br/>To display this screen anytime, press " q ", or click "Home" on the control panel.</p>
+				<p><a href="javascript:showSplash('#instructionsDiv', op = 0.9); helpMessage=true;">Click here for instructions</a>, or press " i " anytime, or click "Help" on the control panel.  To display this screen anytime, press " q ", or click "Home" on the control panel.</p>
 
 				<p>Choose your Adventure:</p>
 			</div>
 
 			<div id="splashdiv5">
-				<div id="loader">Loading</text><span class="loader__dot">.</span><span class="loader__dot">.</span><span class="loader__dot">.</div>
-			</div> <!-- buttons appear after data loads within utils.js -->
+			-->
 
-		</div>
 
-		<div id="instructionsDiv" style="display:none; opacity:0" onclick="hideSplash('#instructionsDiv'); helpMessage=false;">
-			<div style="margin-bottom:10px">
-				<div style="top:0; left:0; color:#FFF008;"><a style="text-decoration: none;" href="javascript:hideSplash('#instructionsDiv'); helpMessage=false;">X</a></div>
-				<div style="top:0; left:10%; font-size:30px; position:absolute">Instructions</div>
-			</div>
-			<div style="overflow-y:scroll; height:90%">
-				<p>This WebGL interactive application allows you to explore content that we premiered in the Adler Planetarium's Grainger Sky Theater dome during the Kavli Lecture by Lisa Kaltenegger on November 3 & 4, 2017.  You are free to explore the data displayed here on your own.  We also provide two different adventures to guide your exploration: Exoplanet Discoveries and the Evolution of our Solar System (available from the yellow buttons on the entry screen).</p>
+			<div id="instructionsDiv"> <!-- style="display:none; opacity:0" onclick="hideSplash('#instructionsDiv'); helpMessage=false;"> -->
+				<div class="instructionsX"><a style="text-decoration: none;" href="javascript:hideSplash('#splash')">X</a></div>
+				<div class="prev" style="visibility: hidden"><a onclick="plusInstructions(-1)">&#10094;</a></div>
+				<div class="next"><a onclick="plusInstructions(1)">&#10095;</a></div>
 
-				<p> The Exoplanet Discoveries adventure allows you to view all of the known exoplanets, up through Nov. 2017, drawn from <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>. The menu on the right, has many options to explore the data.  For instance, the "Exoplanet Marker Color" allows you to view the exoplanets by discovery method, or planet size, or those in the habitable zone.  Try changing the "Exoplanet Marker Type" to "Orrery" and setting the "Time Step Unit" to "Day".  Also, be sure to go through all the "Tours"!  (The "Go To Exoplanet Tour" flies you out to any of the exoplanet systems with at least one planet in the habitable zone.)</p>
+				<div id="instructionsPage1" class="myInstructions fade">
+					<div class="instructionsTitleContainer">
+						<div class="instructionsTitle">Data like you've never seen it before</div>
+					</div>
+					<div class="instructionsContent">
 
-				<p> The Solar System Evolution adventure shows you the future changes that our Sun and Solar System will undergo over the next, nearly 9 billion years.  You can use the "Tour" to watch the future of our Solar System, or use controls to move through the times.  (Please note that the background image of the Galaxy would change in reality over these many millions of years, but is held constant here.)</p>
 
-				<p>Other general instructions</p>
-				<ul>
-					<li>Use the mouse wheel to zoom in and out. Click and drag to move around. </li>
-					<li>Use the user interface in the upper right to control your experience.</li>
-					<li>Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a> </li>
-					<li>Type " i "  to toggle this screen on and off. </li>
-					<li>Type " q "  to toggle the entry screen on and off (where you can choose a different adventure). </li>
-				</ul>
+						<p>The team behind the Adler Planetarium's <a href="">Kavli Fulldome Lecture Series</a> transforms real data sets into stunning, immersive visual experiences.</p>
+		 
+						<p>Here, for the first time, you can fly through the data any way you want to.</p>
 
-				<p>This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software.  </p>
+						<div id="loader" style="font-size:50px">
+							<span>Loading</span>
+							<span class="loader__dot">.</span>
+							<span class="loader__dot">.</span>
+							<span class="loader__dot">.</span>
+						</div>
+
+						<p id="credits" style="position: absolute; bottom: 0px; font-size:10px"><b>Credits</b>: This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software. Patrick McPike contributed design elements.  Exoplanet data is drawn from  <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>.</p>
+
+
+					</div> <!-- buttons appear after data loads within utils.js -->
+		<!--
+						<p>This WebGL interactive application allows you to explore content that we premiered in the Adler Planetarium's Grainger Sky Theater dome during the Kavli Lecture by Lisa Kaltenegger on November 3 & 4, 2017.  You are free to explore the data displayed here on your own.  We also provide two different adventures to guide your exploration: Exoplanet Discoveries and the Evolution of our Solar System (available from the yellow buttons on the entry screen).</p>
+
+						<p> The Exoplanet Discoveries adventure allows you to view all of the known exoplanets, up through Nov. 2017, drawn from <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>. The menu on the right, has many options to explore the data.  For instance, the "Exoplanet Marker Color" allows you to view the exoplanets by discovery method, or planet size, or those in the habitable zone.  Try changing the "Exoplanet Marker Type" to "Orrery" and setting the "Time Step Unit" to "Day".  Also, be sure to go through all the "Tours"!  (The "Go To Exoplanet Tour" flies you out to any of the exoplanet systems with at least one planet in the habitable zone.)</p>
+
+						<p> The Solar System Evolution adventure shows you the future changes that our Sun and Solar System will undergo over the next, nearly 9 billion years.  You can use the "Tour" to watch the future of our Solar System, or use controls to move through the times.  (Please note that the background image of the Galaxy would change in reality over these many millions of years, but is held constant here.)</p>
+
+						<p>Other general instructions</p>
+						<ul>
+							<li>Use the mouse wheel to zoom in and out. Click and drag to move around. </li>
+							<li>Use the user interface in the upper right to control your experience.</li>
+							<li>Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a> </li>
+							<li>Type " i "  to toggle this screen on and off. </li>
+							<li>Type " q "  to toggle the entry screen on and off (where you can choose a different adventure). </li>
+						</ul>
+
+						<p>This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software.  </p>
+					</div>
+				-->
+				</div>
+
+
+				<div id="instructionsPage2" class="myInstructions fade">
+					<div class="instructionsTitleContainer">
+						<div class="instructionsTitle">Exploring exoplanets with Dr. Lisa Kaltenegger</div>
+					</div>
+					<div class="instructionsContent">
+
+						<p> If there's life out there, it has to live somewhere. Scientists like Dr. Lisa Kaltenegger study exoplanets &mdash; planets outside our Solar System &mdash; in search of environments that might harbor life.</p>
+	 
+						<p>Using the same data displayed on our dome during Dr. Kaltenegger's lecture, <i>Are We Alone in the Universe?</i>, our team created this interactive exoplanet explorer.</p>
+	 
+						<p>You begin nearby to our Solar System, shown by the thin yellow, blue, red and purple lines in the center of the screen. The thicker circles all around you represent the orbits of exoplanets that scientists have observed orbiting other stars.  Fly around using your mouse (or touch device) to see where these planets are relative to us. </p>
+					</div>
+				</div>
+
+				<div id="instructionsPage3" class="myInstructions fade">
+					<div class="instructionsTitleContainer">
+						<div class="instructionsTitle">Choose Your Adventure</div>
+					</div>
+					<div class="instructionsContent">
+						<p id="splashButtonP" style="text-align:center; padding:0; margin:0">Explore all the known exoplanets</p>
+						<button class="splashButton" onclick="showExop()">Exoplanet Discoveries</button>
+						
+						<p id="splashButtonP" style="text-align:center; padding:0; margin:0; margin-top:20px">Visit the distant future of our Sun and Solar System</p>
+						<button class="splashButton" onclick="showSSEvol()">Solar System Evolution</button>
+						
+						<p id="splashButtonP" style="text-align:center; padding:0; margin:0; margin-top:20px">Chart your own course! *</p>
+						<button class="splashButton" onclick="showFree()">Free Exploration</button>
+
+						<p id="splashButtonP" style="margin-top:50px; font-size:10px">* Only the first two adventures contain a control panel with many additional ways to interact with the data</p>
+
+						<div style="display:none" id="ExopInstructions">
+							<p style="font-size:30px"> Exoplanet Discoveries: </p>
+							<p> The Control Panel on the right lets you color-code the exoplanets by size or other attribute, and even go back or forward in time.</p>
+							<p> You can always click the "Home" button in the upper right, or type "q" to choose a different journey. </p>
+						</div>
+
+						<div style="display:none" id="SSInstructions">
+							<p style="font-size:30px"> Solar System Evolution: </p>
+							<p> The Control Panel on the right lets you color-code the exoplanets by size or other attribute, and even go back or forward in time.</p>
+							<p> You can always click the "Home" button in the upper right, or type "q" to choose a different journey. </p>						
+						</div>
+
+						<div style="display:none" id="FreeInstructions">
+							<p style="font-size:30px"> Free Exploration: </p>
+							<p> Fly around using your mouse (or touch device), and zoom in and out, to see where these planets are relative to us. </p>
+
+							<p> You can always click the "Home" button in the upper right, or type "q" to choose a different journey. (The other adventures allow you to manipulate the data even more!) </p>
+						</div>
+					</div>
+				</div>
+
+				<!-- circles -->
+				<div class="dotDiv">
+					<span class="dot" onclick="currentInstructions(1)"></span> 
+					<span class="dot" onclick="currentInstructions(2)"></span> 
+					<span class="dot" onclick="currentInstructions(3)"></span> 
+				</div>
 			</div>
 		</div>
 

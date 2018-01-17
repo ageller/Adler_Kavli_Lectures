@@ -107,11 +107,11 @@ var HZEvol = null;
 var exoplanets = null;
 var planets = null;
 
-showExoplanetGUI = false;
-showSolarSystemEvolGUI = false;
+var showExoplanetGUI = false;
+var showSolarSystemEvolGUI = false;
 
-splashMessage = true;
-helpMessage = false;
+var splashMessage = true;
+var instructionIndex = 1;
 
 function init() {
 	// scene
@@ -292,17 +292,8 @@ function defineParams(){
 		this.zoomSpeed = 1.;
 		this.stereoSep = 0.064;
 
-//home screen and instructions
+//home screen 
 		this.splash = function(){showSplash("#splash");};
-		this.instructions = function(){
-	       helpMessage=!helpMessage;
-	        if (helpMessage){
-	            showSplash("#instructionsDiv", op = 0.9);
-	        }
-	        else{
-	            hideSplash("#instructionsDiv");
-	        }
-	    };
 
 //for Legend
 		this.noData = [128., 128., 128.]
@@ -599,7 +590,6 @@ function defineGUI(){
 
 	gui = new dat.GUI({ width: 450 } )
 	gui.add(params,'splash').name("Home");
-	gui.add(params,'instructions').name("Help");
 
 	basicGUI = gui.addFolder('Controller');
 
@@ -907,6 +897,10 @@ function loadData(callback){
 
 
 function WebGLStart(){
+	resizeInstructions();
+	window.addEventListener("resize", resizeInstructions);
+	
+	showInstructions(instructionIndex);
 
 	clearloading();
 
@@ -931,7 +925,6 @@ function WebGLStart(){
 //initial GUI
 	gui = new dat.GUI({ width: 450 } )
 	gui.add(params,'splash').name("Home");
-	gui.add(params,'instructions').name("Help");
 
 
 //draw everything

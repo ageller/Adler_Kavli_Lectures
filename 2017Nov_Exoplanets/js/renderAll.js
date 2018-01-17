@@ -19,15 +19,6 @@ function update(time){
         }
     }
 
-	if ( keyboard.down("I") ) {
-        helpMessage=!helpMessage;
-        if (helpMessage){
-            showSplash("#instructionsDiv", op = 0.9);
-        }
-        else{
-            hideSplash("#instructionsDiv");
-        }
-    }
 	controls.update();
 	TWEEN.update(time);
 	SunMesh.material.uniforms.cameraCenter.value = camera.position;
