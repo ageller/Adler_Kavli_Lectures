@@ -103,7 +103,7 @@ function drawMilkyWay()
 			size: {value: size1},
 			dfac: {value: 0.},
 			radius: {value: 0.},
-			MWalpha: {value: params.MWalpha },
+			MWalpha: {value: 1. },
 
 		},
 
@@ -127,7 +127,7 @@ function drawMilkyWay()
 			dfac: {value: dfac},
 			size: {value: size2},
 			radius: {value: 0.},
-			MWalpha: {value: params.MWalpha },
+			MWalpha: {value: 1. },
 		},
 
 		vertexShader: MWVertexShader,
@@ -151,7 +151,7 @@ function drawMilkyWay()
 			dfac: {value: dfac},
 			size: {value: size3},
 			radius: {value: 0.},
-			MWalpha: {value: params.MWalpha },
+			MWalpha: {value: 1. },
 
 		},
 
@@ -172,7 +172,7 @@ function drawMilkyWay()
 	var MWMaterial =  new THREE.ShaderMaterial( {
 		uniforms: {
 			tex: { type: "t", value: MWTex},
-			MWalpha: {value: params.MWalpha },
+			MWalpha: {value: 1. },
 			MWTexalpha: {value: 1. },
 
 		},
