@@ -94,7 +94,6 @@ function drawMilkyWay()
 	var Ssize = 0.5; //size of star points
 	var dfac = 4; //decrease in size of star points with distance from center (to help make bulge brighter)
 
-
 	var galaxy1 = createSpiralGalaxy(2, 1000, radius, scaleHeight, 0.5, N*fac3, B*fac3, armsRot = armsRot, Nbar = -1., radmax=1.5); //blue
 	var size1 = 3.*scaleUp;
 	var galaxy1Material = new THREE.ShaderMaterial( { 
