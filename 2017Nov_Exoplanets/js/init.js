@@ -267,24 +267,24 @@ function clearLegendFolder(name, type){
 
 function populateLegend(type){
 	if (type == 1){
-		addToLegend("radialVelocity", "Radial Velocity");
-		addToLegend("transit", "Transit");
-		addToLegend("transitTiming", "Timing");
-		addToLegend("imaging", "Imaging");
-		addToLegend("microlens", "Microlensing");
-		addToLegend("noData", "No Data");
+		addToLegend("radialVelocity", "<a href='https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets#Radial_velocity' target='_blank'>Radial Velocity</a>");
+		addToLegend("transit", "<a href='https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets#Transit_photometry' target='_blank'>Transit</a>");
+		addToLegend("transitTiming", "<a href='https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets#Transit_timing' target='_blank'>Timing</a>");
+		addToLegend("imaging", "<a href='https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets#Direct_imaging' target='_blank'>Imaging</a>");
+		addToLegend("microlens", "<a href='https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets#Gravitational_microlensing' target='_blank'>Microlensing</a>");
+		addToLegend("noData", "<a href='https://en.wikipedia.org/wiki/Methods_of_detecting_exoplanets' target='_blank'>No Data</a>");
 	}
 	if (type == 2){
-		addToLegend("subEarths", "Sub-Earths");
-		addToLegend("Earths", "Earths");
-		addToLegend("superEarths", "Super-Earths");
-		addToLegend("Neptunes", "Neptunes");
-		addToLegend("Jupiters", "Jupiters");
-		addToLegend("larger", "Larger");
+		addToLegend("subEarths", "<a href='https://en.wikipedia.org/wiki/Sub-Earth' target='_blank'>Sub-Earths</a>");
+		addToLegend("Earths", "<a href='https://en.wikipedia.org/wiki/Terrestrial_planet#Extrasolar_terrestrial_planets' target='_blank'>Earths</a>");
+		addToLegend("superEarths", "<a href='https://en.wikipedia.org/wiki/Super-Earth' target='_blank'>Super-Earths</a>");
+		addToLegend("Neptunes", "<a href='https://en.wikipedia.org/wiki/Giant_planet#Extrasolar_giant_planets' target='_blank'>Neptunes</a>");
+		addToLegend("Jupiters", "<a href='https://en.wikipedia.org/wiki/Giant_planet#Extrasolar_giant_planets' target='_blank'>Jupiters</a>");
+		addToLegend("larger", "<a href='https://en.wikipedia.org/wiki/Super-Jupiter' target='_blank'>Larger</a>");
 	}
 	if (type == 3){
-		addToLegend("inHabitableZone", "In Habitable Zone");
-		addToLegend("outside", "Outside");
+		addToLegend("inHabitableZone", "<a href='https://en.wikipedia.org/wiki/Circumstellar_habitable_zone#Extrasolar_extrapolation' target='_blank'>In Habitable Zone</a>");
+		addToLegend("outside", "<a href='https://en.wikipedia.org/wiki/Circumstellar_habitable_zone#Extrasolar_extrapolation' target='_blank'>Outside</a>");
 	}
 	legendGUI.open();
 }
