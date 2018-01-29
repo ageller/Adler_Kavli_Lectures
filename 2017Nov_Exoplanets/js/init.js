@@ -241,43 +241,63 @@ dat.GUI.prototype.removeFolder = function(name) {
 	this.onResize();
 }
 
-function addToLegend(val){
-	legendGUI.addColor( params, val);
+function addToLegend(val, name){
+
+	legendGUI.addColor( params, val).name(name);
 	var foo = getController(legendGUI, params, val);
 	foo.__selector.outerHTML = "";
 	delete foo.__selector;	
 	foo.__input.style.color = foo.__input.style.backgroundColor;//'rgb('+params[val]+')';
 	foo.__input.style.textShadow = 'rgba(0,0,0,0) 0px 0px 0px';
 }
-function makeLegend(type){
-//	"DiscoveryMethod": 1, "PlanetSize": 2, "HabitableZone": 3
-	if (legendGUI != null){
-		gui.removeFolder('Legend');
-	}
 
-	legendGUI = gui.addFolder('Legend');
+function clearLegendFolder(name, type){
+	var controllers = name.__controllers;
+	var Nc = controllers.length
+	for (var i = 0; i < Nc; i++){ 
+	//controllers.forEach(function(d, i){
+		d = controllers[0];
+		name.remove(d);
+		if (i == Nc-1){
+			populateLegend(type);
+		}
+	};
+	//);
+}
 
+function populateLegend(type){
 	if (type == 1){
-		addToLegend("radialVelocity");
-		addToLegend("transit");
-		addToLegend("transitTiming");
-		addToLegend("imaging");
-		addToLegend("microlens");
-		addToLegend("noData");
+		addToLegend("radialVelocity", "Radial Velocity");
+		addToLegend("transit", "Transit");
+		addToLegend("transitTiming", "Timing");
+		addToLegend("imaging", "Imaging");
+		addToLegend("microlens", "Microlensing");
+		addToLegend("noData", "No Data");
 	}
 	if (type == 2){
-		addToLegend("subEarths");
-		addToLegend("Earths");
-		addToLegend("superEarths");
-		addToLegend("Neptunes");
-		addToLegend("Jupiters");
-		addToLegend("larger");
+		addToLegend("subEarths", "Sub-Earths");
+		addToLegend("Earths", "Earths");
+		addToLegend("superEarths", "Super-Earths");
+		addToLegend("Neptunes", "Neptunes");
+		addToLegend("Jupiters", "Jupiters");
+		addToLegend("larger", "Larger");
 	}
 	if (type == 3){
-		addToLegend("inHabitableZone");
-		addToLegend("outside");
+		addToLegend("inHabitableZone", "In Habitable Zone");
+		addToLegend("outside", "Outside");
 	}
 	legendGUI.open();
+}
+
+function makeLegend(type){
+
+	if (legendGUI == null){
+		legendGUI = gui.addFolder('Legend');
+		populateLegend(type); //on first pass, this will create, destroy and create (silly, but that's quick enough)
+	} else {
+		//gui.removeFolder('Legend');
+	}
+	clearLegendFolder(legendGUI, type);
 
 }
 
@@ -360,7 +380,7 @@ function defineParams(){
 			}
 		};
 //Galaxy controls
-		this.MWalpha = 1.;
+		this.MWalpha = 0.7;
 		this.ShowHideMilkyWay = function() {
 			checkController = getController(basicGUI, params, "ShowHideMilkyWay");
 			if (checkController != null){
@@ -620,6 +640,11 @@ function defineGUI(){
 
 	basicGUI.open()
 
+//legend
+	if (showExoplanetGUI){
+		makeLegend(params.exopColorMode);
+	}
+
 //tours
 	var toursGUI = gui.addFolder('Tours');
 	if (showExoplanetGUI){
@@ -676,9 +701,7 @@ function defineGUI(){
 
 	MWGUI.add( params, 'MWalpha',0., 1. ).onChange( params.updateMW ).name("Milky Way Transparency");
 
-	if (showExoplanetGUI){
-		makeLegend(params.exopColorMode);
-	}
+
 }
 
 function defineTweens(){
@@ -758,7 +781,7 @@ function defineTweens(){
 		MWInTweening = true;
 	});
 	MWAlphaTween.onUpdate(function(object){
-		var MWalpha = Math.min(object.value, Math.max(0., (1. - MWDfac/camDist)));
+		var MWalpha = Math.min(object.value * (1. / params.MWalpha), Math.max(0., (1. - MWDfac/camDist)));
 		MilkyWayMesh.forEach( function( m, i ) {
 			m.material.uniforms.MWalpha.value = MWalpha;
 		});	

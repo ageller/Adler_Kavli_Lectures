@@ -15,41 +15,61 @@ function clearloading(){
 
     var loader = d3.select(".instructionsContent").select("#loader");
     loader.selectAll("span").remove();
+
+	d3.select("#credits").style("visibility","visible");
+
 }
 
 function resizeInstructions(){
 	height = window.innerHeight;
 	width = window.innerWidth;
-    d3.selectAll(".instructionsContent").style("height", height - 250. + 'px');
+	var theight = d3.selectAll(".instructionsTitleContainer").style("height").slice(0, -2);
+	if (theight == 'au'){
+		theight = 60.;
+	} else {
+		theight = parseFloat(theight) - 60.;
+	}
+    d3.selectAll(".instructionsContent").style("height", height - theight - 150. + 'px')
     d3.select('#instructionsDiv').style("height",height - 40. + 'px');
     d3.select('#instructionsDiv').style("visibility","visible");
 
-    if (height < 450){
+
+
+
+    if (height < 500){
 		d3.selectAll("#credits").style("position","relative");
     } else {
 		d3.selectAll("#credits").style("position","absolute");
-
     }
 
-    if (isMobile){
-    	var woff = 24.; //not sure why this is needed
-    	var wd = width - woff;
-    	var container = d3.select('#instructionsDiv');
-    	container.style("width",wd + 'px');
-    	container.style("left",wd/2. + 'px');
-    	container.style("margin-left", -wd/2. + 'px');
-
-		d3.selectAll(".next").style("left", wd-5 + 'px');
-
-		d3.selectAll(".splashButton").style("margin-left", (wd-80-250)/2. + 'px');
-		d3.selectAll(".splashButton").style("font-size", "30px"); 
-
-		d3.selectAll(".myInstructions").style("width", wd-80 + 'px');
-
+	var woff = 24.; //not sure why this is needed
+	var win = 400.; //how far from the edge should we go
+	var wmin = 480.; //minimum size of the window
+	var wd = width - woff - win;
+	if (wd < wmin){
+		win = Math.max(width - woff - wmin, 0.);
+		wd = width - woff - win;
+	}
+	if (isMobile){
+		win = 0.;
+		wd = width - woff;
 		d3.selectAll(".instructionsTitle").style("font-size", "72px"); 
 		d3.selectAll(".instructionsContent").style("font-size", "46px"); 
+		d3.selectAll(".splashButton").style("font-size", "30px"); 
     }
+
+	var container = d3.select('#instructionsDiv');
+	container.style("width",wd + 'px');
+	container.style("left",(wd + win)/2. + 'px');
+	container.style("margin-left", -wd/2. + 'px');
+
+	d3.selectAll(".next").style("left", wd-5 + 'px');
+
+	d3.selectAll(".splashButton").style("margin-left", (wd-80-250)/2. + 'px');
+
+	d3.selectAll(".myInstructions").style("width", wd-80 + 'px');
 }
+
 
 function hideButtons(){
     d3.selectAll("#splashButtonP").style("display","none")
@@ -67,6 +87,7 @@ function currentInstructions(n) {
 }
 
 function showInstructions(n) {
+	resizeInstructions();
 	if (n == 2){
 		d3.selectAll("#splashButtonP").style("display","block");
 		d3.selectAll(".splashButton").style("display","inline-block");
@@ -120,40 +141,32 @@ function showExop(){
 	showControlInstructions('#ExopInstructions')
 
 	button = d3.select('#instructionsPage3').select('#GoButton');
-	button.attr('onclick','runExop()');
 	button.style('display','inline-block');
 
-
-}
-function runExop(){
 	showExoplanetGUI = true; 
 	showSolarSystemEvolGUI = false; 
 	defineGUI(); 
 	if (!exoplanetsON){
 		params.ShowHideExoplanets()
 	}
-	hideSplash("#splash");
 	controls.maxDistance = 1.e10;
 
 }
+
 
 function showSSEvol(){
 	hideButtons();
 	showControlInstructions('#SSInstructions')
 
 	button = d3.select('#instructionsPage3').select('#GoButton');
-	button.attr('onclick','runSSEvol()');
 	button.style('display','inline-block');
 
-}
-function runSSEvol(){
 	showExoplanetGUI = false; 
 	showSolarSystemEvolGUI = true; 
 	defineGUI(); 
 	if (exoplanetsON){
 		params.ShowHideExoplanets()
 	}
-	hideSplash("#splash");
 	controls.maxDistance = 500;
 
 }
@@ -164,12 +177,8 @@ function showFree(){
 	showControlInstructions('#FreeInstructions')
 
 	button = d3.select('#instructionsPage3').select('#GoButton');
-	button.attr('onclick','runFree()');
 	button.style('display','inline-block');
 
-}
-function runFree(){
-	
 	showExoplanetGUI = false; 
 	showSolarSystemEvolGUI = false; 
 	if (gui != null){
@@ -187,10 +196,10 @@ function runFree(){
 	if (!MilkyWayON){
 		params.ShowHideMilkyWay()
 	}
-	hideSplash("#splash");
 	controls.maxDistance = 1.e10;
 
 }
+
 
 //hide the splash screen
 function hideSplash(id){

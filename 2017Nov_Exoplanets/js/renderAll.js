@@ -106,7 +106,7 @@ function render() {
 	}
 
 	if (MilkyWayON && !MWInTweening){
-		var MWalpha = Math.min(params.MWalpha, Math.max(0., (1. - MWDfac/camDist)));
+		var MWalpha = Math.min(1., Math.max(0., (1. - MWDfac/camDist)));
 		MilkyWayMesh.forEach( function( m, i ) {
 			m.material.uniforms.MWalpha.value = MWalpha;
 		});	

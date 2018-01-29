@@ -47,7 +47,7 @@
 			-->
 
 
-			<div id="instructionsDiv"> <!-- style="display:none; opacity:0" onclick="hideSplash('#instructionsDiv'); helpMessage=false;"> -->
+			<div id="instructionsDiv" style="visibility: hidden"> 
 				<div class="instructionsX" style="visibility: hidden"><a style="text-decoration: none;" href="javascript:hideSplash('#splash')">X</a></div>
 				<div class="prev" style="visibility: hidden"><a onclick="plusInstructions(-1)">&#10094;</a></div>
 				<div class="next" style="visibility: hidden"><a onclick="plusInstructions(1)">&#10095;</a></div>
@@ -63,6 +63,7 @@
 		 
 						<p>Here, for the first time, you can fly through the data any way you want to.</p>
 
+	
 						<div id="loader" style="font-size:50px">
 							<span>Loading</span>
 							<span class="loader__dot">.</span>
@@ -70,29 +71,11 @@
 							<span class="loader__dot">.</span>
 						</div>
 
-						<p id="credits" style="position: absolute; bottom: 0px; font-size:10px"><b>Credits</b>: This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software. Patrick McPike contributed design elements.  Exoplanet data is drawn from  <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>.  The background <a href="https://www.eso.org/public/usa/images/eso0932a/" target="_blank">Milky Way galaxy panorama image</a> is from ESO/S. Brunier. Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a></p>
+
+						<p id="credits" style="position: absolute; bottom: 0px; font-size:10px; visibility:hidden"><b>Credits</b>: This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software. Patrick McPike contributed design elements.  Exoplanet data is drawn from  <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>.  The background <a href="https://www.eso.org/public/usa/images/eso0932a/" target="_blank">Milky Way galaxy panorama image</a> is from ESO/S. Brunier. Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a></p>
 
 
-					</div> <!-- buttons appear after data loads within utils.js -->
-		<!--
-						<p>This WebGL interactive application allows you to explore content that we premiered in the Adler Planetarium's Grainger Sky Theater dome during the Kavli Lecture by Lisa Kaltenegger on November 3 & 4, 2017.  You are free to explore the data displayed here on your own.  We also provide two different adventures to guide your exploration: Exoplanet Discoveries and the Evolution of our Solar System (available from the yellow buttons on the entry screen).</p>
-
-						<p> The Exoplanet Discoveries adventure allows you to view all of the known exoplanets, up through Nov. 2017, drawn from <a href="http://openexoplanetcatalogue.com/" target="_blank">the Open Exoplanet Catalogue</a>. The menu on the right, has many options to explore the data.  For instance, the "Exoplanet Marker Color" allows you to view the exoplanets by discovery method, or planet size, or those in the habitable zone.  Try changing the "Exoplanet Marker Type" to "Orrery" and setting the "Time Step Unit" to "Day".  Also, be sure to go through all the "Tours"!  (The "Go To Exoplanet Tour" flies you out to any of the exoplanet systems with at least one planet in the habitable zone.)</p>
-
-						<p> The Solar System Evolution adventure shows you the future changes that our Sun and Solar System will undergo over the next, nearly 9 billion years.  You can use the "Tour" to watch the future of our Solar System, or use controls to move through the times.  (Please note that the background image of the Galaxy would change in reality over these many millions of years, but is held constant here.)</p>
-
-						<p>Other general instructions</p>
-						<ul>
-							<li>Use the mouse wheel to zoom in and out. Click and drag to move around. </li>
-							<li>Use the user interface in the upper right to control your experience.</li>
-							<li>Source code available on <a href="https://github.com/ageller/Adler_Kavli_Lectures" target="_blank">our GitHub page.</a> </li>
-							<li>Type " i "  to toggle this screen on and off. </li>
-							<li>Type " q "  to toggle the entry screen on and off (where you can choose a different adventure). </li>
-						</ul>
-
-						<p>This WebGL application was written by <a href="http://faculty.wcas.northwestern.edu/aaron-geller/index.php" target="_blank">Aaron M. Geller</a>, using the three.js library.  Much of the concept and code for the exoplanet shaders was written by Mark SubbaRao, originally for the Uniview software.  </p>
-					</div>
-				-->
+					</div> 
 				</div>
 
 
@@ -124,43 +107,59 @@
 						<p id="splashButtonP" style="text-align:center; padding:0; margin-top:20px; margin-bottom:0px">Chart your own course! *</p>
 						<button class="splashButton" onclick="showFree()">Free Exploration</button>
 
-						<p id="splashButtonP" style="margin-top:50px; font-size:10px">* Only the first two adventures contain a control panel with many additional ways to interact with the data</p>
+						<p id="splashButtonP" style="margin-top:50px; font-size:10px; text-align:center">* Only the first two adventures contain a control panel with many additional ways to interact with the data</p>
 
 						<div style="display:none" id="ExopInstructions">
 							<p style="font-size:30px"> Exoplanet Discoveries: </p>
-							<p> Click (or touch) + drag to fly around, scroll (or pinch) to zoom in and out, and discover where exoplanets are relative to us, how big they are, how and when they were discovered, and which ones are in the habitable zones of their host stars. </p>
-							<p> The Control Panel on the right allows you to dive deeper into these data!</p>
+							<p> Find out where exoplanets are relative to us, how big they are, how and when they were discovered, and which ones are in the habitable zones of their host stars.</p>
+
+							<p>Click (or touch) and drag to fly around.</p>
+
+							<p>Scroll (or pinch) to zoom in and out.</p>
+
+
+							<p> Use the Control Panel on the right to see the data in a different way.</p>
 							<ul>
-								<li>The "Controller" section, gives you control over the time.  Use the slider to watch when the exoplanets were discovered! Change how the exoplanets are displayed by changing the "Marker Color" or "Marker Type".  Hint: watch the planets in the Orrery Marker Type orbit on their true periods.</li>
-								<li> The "Tours" section contains many tours you can click on to travel around space and time.</li>
-								<li> The "Extra Controls" section gives you many expert controls that we use at the Adler.  Check them out!</li>
-								<li> The "Legend" section explains what the exoplanet "Marker Colors" correspond to</li>
+								<li>The "Controller" section lets you jump forward or backward in time. Use the slider to see when the exoplanets were discovered!</li>
+								<li>Change how the exoplanets are displayed by changing the "Marker Color" or "Marker Type." The Orrery Marker Type shows where each exoplanet is in its orbit at any given time.</li>
+								<li>The "Legend" section explains what the exoplanet "Marker Colors" mean.</li>
+								<li>Change your perspective, see which exoplanets were discovered over time, or jump to a particular exoplanet with the "Tours" section. </li>
+								<li>The "Extra Controls" section gives you many expert controls that we use at the Adler. Check them out!</li>
 							</ul>
 
 							<p> You can always click the "Home" button in the upper right, or type "q" to choose a different journey. </p>
+
 						</div>
 
 						<div style="display:none" id="SSInstructions">
 							<p style="font-size:30px"> Solar System Evolution: </p>
-							<p> Click (or touch) + drag to fly around, scroll (or pinch) to zoom in and out, and explore our Solar System as the Sun changes from its current stage to a red giant, an asymptotic giant, and eventually a white dwarf.  The green band shows the habitable zone around the Sun. (The Earth lives there for now, but how long will that last?!) </p>
+							<p> Follow our Solar System billions of years into the future as the Sun evolves from its current stage into a red giant, an asymptotic giant, and eventually a white dwarf.</p>
 
-							<p> The Control Panel on the right allows you to dive deeper into these data!</p>
+							<p>The green band around the Sun shows the habitable zone: the distance from the Sun that a planet would have to be to have liquid water on it's surface (and therefore to potentially support life as we know it). Earth is in the habitable zone for now, but for how long? Click through to find out!</p>
+
+							<p>Click (or touch) and drag to fly around.</p>
+
+							<p>Scroll (or pinch) to zoom in and out.</p>
+
+							<p>Use the Control Panel on the right to see the data in a different way.</p>
 							<ul>
-								<li>The "Controller" section, gives you control over the time.  Use the slider to watch how the Sun and the planet orbits change as the Sun lives out the rest of its life. </li>
-								<li> The "Tours" section contains two buttons you can click on to either center your view on our Solar System or watch our Sun and Solar System change over the next few billion years.</li>
-								<li> The "Extra Controls" section gives you many expert controls that we use at the Adler.  Check them out!</li>
+								<li>The "Controller" section lets you jump forward or backward in time. Use the slider to watch how the Sun and the planet orbits change as the Sun lives out the rest of its life.</li>
+								<li>With the "Tours" section, you can enter your view on our Solar System or watch our Sun and Solar System change over the next few billion years.</li>
+								<li>The "Extra Controls" section gives you many expert controls that we use at the Adler. Check them out!</li>
 							</ul>
+
 							<p> You can always click the "Home" button in the upper right, or type "q" to choose a different journey. </p>						
 						</div>
 
 						<div style="display:none" id="FreeInstructions">
 							<p style="font-size:30px"> Free Exploration: </p>
-							<p> Click (or touch) + drag to fly around, scroll (or pinch) to zoom in and out, and discover where exoplanets are relative to us. </p>
+							<p> Click (or touch) and drag to fly around, scroll (or pinch) to zoom in and out, and discover where exoplanets are relative to us. </p>
 
 							<p> You can always click the "Home" button in the upper right, or type "q" to choose a different journey. (The other adventures allow you to manipulate the data even more!) </p>
+
 						</div>
 
-						<button id="GoButton" class="splashButton" style="display:none">Go!</button>
+						<button id="GoButton" class="splashButton" onclick="hideSplash('#splash')" style="display:none">Go!</button>
 
 					</div>
 				</div>
