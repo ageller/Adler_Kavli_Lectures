@@ -20,7 +20,32 @@ function clearloading(){
 
 }
 
+function resizeMobile(){
+	d3.selectAll(".instructionsTitle").style("font-size", "72px"); 
+	d3.selectAll(".instructionsSubTitle").style("font-size", "60px"); 
+	d3.selectAll(".instructionsContent").style("font-size", "46px"); 
+	d3.selectAll(".splashButton").style("font-size", "30px"); 
+
+//for dat.gui (but would require changes whenever a section is closed)
+//	d3.selectAll(".dg .property-name").style("font-size", "30px");
+//	d3.selectAll(".dg .cr.function").style("height", "94px");
+//	d3.selectAll(".dg .cr.number").style("height", "94px");
+//	d3.selectAll(".dg .cr.color").style("height", "94px");
+	d3.selectAll(".dg li.title").style("height", "36px");
+	d3.selectAll(".dg li.title").style("font-size", "30px");
+	var d = document.getElementsByClassName("function");
+	for (var i =0; i < d.length; i++){
+		var x = d[i].innerHTML.indexOf("Home</span>");
+		if (x != -1){
+			d[i].style.fontSize = "30px"
+			d[i].style.height = "36px" //not sure if this is working
+		}
+	}
+
+}
+
 function resizeInstructions(){
+
 	height = window.innerHeight;
 	width = window.innerWidth;
 	var theight = d3.selectAll(".instructionsTitleContainer").style("height").slice(0, -2);
@@ -32,9 +57,6 @@ function resizeInstructions(){
     d3.selectAll(".instructionsContent").style("height", height - theight - 150. + 'px')
     d3.select('#instructionsDiv').style("height",height - 40. + 'px');
     d3.select('#instructionsDiv').style("visibility","visible");
-
-
-
 
     if (height < 500){
 		d3.selectAll("#credits").style("position","relative");
@@ -53,9 +75,6 @@ function resizeInstructions(){
 	if (isMobile){
 		win = 0.;
 		wd = width - woff;
-		d3.selectAll(".instructionsTitle").style("font-size", "72px"); 
-		d3.selectAll(".instructionsContent").style("font-size", "46px"); 
-		d3.selectAll(".splashButton").style("font-size", "30px"); 
     }
 
 	var container = d3.select('#instructionsDiv');
@@ -186,6 +205,9 @@ function showFree(){
 	}
 	gui = new dat.GUI({ width: 450 } )
 	gui.add(params,'splash').name("Home");
+	if (isMobile){
+		resizeMobile();
+	}
 
 	if (!exoplanetsON){
 		params.ShowHideExoplanets()

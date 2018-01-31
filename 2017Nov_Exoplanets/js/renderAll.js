@@ -19,6 +19,28 @@ function update(time){
         }
     }
 
+    //pause the time evolution
+	if ( keyboard.down("space") ) {
+		params.pause = !params.pause;
+		if (params.pause){
+			params.saveTimeStepFac = params.timeStepFac;
+			params.timeStepFac = 0.;
+		} else {
+			params.timeStepFac = params.saveTimeStepFac;
+		}
+		params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+
+	}
+	if ( keyboard.down("left") ) {
+		params.timeStepFac = -1. * Math.abs(params.timeStepFac);
+		params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+
+	}
+	if ( keyboard.down("right") ) {
+		params.timeStepFac = Math.abs(params.timeStepFac);
+		params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+
+	}
 	controls.update();
 	TWEEN.update(time);
 	SunMesh.material.uniforms.cameraCenter.value = camera.position;
@@ -39,23 +61,36 @@ function render() {
 	//for updating the exoplanets
 	if (parseFloat(params.pastYrs) < 2017){
 		params.futureMillionYrs = 0.
+
 	}
-	params.timeStep = parseFloat(params.timeStepUnit)*parseFloat(params.timeStepFac);
-	params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs)*1.e6, 2017);
-	if (params.timeStep > 0){
+	if (runningExopDiscYrs && params.pastYrs >= 2017){
+		runningExopDiscYrs = false;
+		params.timeStepFac = 0.;
+		params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+	}
+	if (runningFutureSS && Math.abs(params.futureMillionYrs - maxTime) < 10){
+		runningFutureSS = false;
+		params.timeStepFac = 0.;
+		params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+	}
+	if (!params.pause){
+		params.saveTimeStepFac = params.timeStepFac;
+	}
+	if (params.timeStepUnit == "equal"){//equal mass loss steps
+		params.iEvol = THREE.Math.clamp(parseFloat(SuniEvol) + parseFloat(params.timeStepFac), 0, iLength-1);
+		params.futureMillionYrs = SunEvol.timeInterp.evaluate(params.iEvol);
+		params.futureMillionYrs = Math.min(params.futureMillionYrs, maxTime);
+		params.updateSSExop();
+	} else {
+		params.timeStep = parseFloat(params.timeStepUnit)*parseFloat(params.timeStepFac);
+		params.pastYrs = Math.min(parseFloat(params.pastYrs) + parseFloat(params.futureMillionYrs)*1.e6, 2017);
 		params.pastYrs += params.timeStep;
 		params.pastYrs = Math.min(params.pastYrs, 2017.);
 		params.futureMillionYrs += (params.timeStep/1.e6);
 		params.futureMillionYrs = Math.min(params.futureMillionYrs, maxTime)
 		params.updateSSExop();
 	}
-	if (params.timeStep < 0){ //equal mass loss steps
-		params.iEvol = THREE.Math.clamp(parseFloat(SuniEvol) + parseFloat(params.timeStepFac), 0, iLength-1);
-		params.futureMillionYrs = SunEvol.timeInterp.evaluate(params.iEvol);
-		params.futureMillionYrs = Math.min(params.futureMillionYrs, maxTime);
-		params.updateSSExop();
-
-	}
+	
 
 
 

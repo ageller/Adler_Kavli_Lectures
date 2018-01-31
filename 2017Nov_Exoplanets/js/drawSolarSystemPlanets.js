@@ -57,7 +57,7 @@ function createOrbit(semi, ecc, inc, lan, ap, tperi, period, Ntheta = 10.){
 function makeLine( geo , color = 'white', rotation = null) {
 
 	var g = new MeshLine();
-	if (params.timeStep < 1.e4 && params.timeStep >= 0 && !inSSEvolTween){
+	if (Math.abs(params.timeStep) < 1.e4 && params.timeStepUnit != "equal" && !inSSEvolTween){
 		g.setGeometry( geo, function( p ) { return Math.pow(p, params.SSlineTaper ) ; });
 	} else {
 		g.setGeometry(geo)

@@ -62,14 +62,17 @@ var exoplanetsON = true;
 var exoplanetsOFFtime = false;
 var exoplanetsInTweening = false;
 var exoplanetsInMotion = false;
+var exoplanetSelected = false;
 var exopAlphaTween;
 var exopAlphaTweenValue;
+var runningExopDiscYrs = false;
 
 var SolarSystemON = true;
 var SolarSystemInTweening = false;
 var SSValsNeedReset = false;
 var SSAlphaTween;
 var SSAlphaTweenValue;
+var runningFutureSS = false;
 
 var MilkyWayON = true;
 var MWOFFtime = false;
@@ -312,6 +315,8 @@ function defineParams(){
 		this.zoomSpeed = 1.;
 		this.stereoSep = 0.064;
 
+		this.pause = false; //toggles pausing time evolution on/off with space bar
+
 //home screen 
 		this.splash = function(){showSplash("#splash");};
 
@@ -358,6 +363,7 @@ function defineParams(){
 //exoplanet controls
         this.timeStepUnit = 0.;
         this.timeStepFac = 1.;
+        this.saveTimeStepFac = 1.;
         this.timeStep = parseFloat(this.timeStepUnit)*parseFloat(this.timeStepFac);
         this.exopSize = exopSize0;
        	this.exoplanetMinSize = exoplanetMinSize0;
@@ -425,6 +431,7 @@ function defineParams(){
 
 			if (params.GoToExoplanet != ""){
 				exoplanetsInMotion = true;
+				exoplanetSelected = true;
 
 				var i = uExoplanets.name.indexOf(params.GoToExoplanet);
 				var pos = uExoplanets.position[i];
@@ -451,18 +458,20 @@ function defineParams(){
 				exoplanetViewTween.start();
 				exoplanetsMesh[imesh].material.uniforms.exopAlpha.value = 1.;
 
-
+			} else {
+				exoplanetSelected = false;
 			}
 		}
 		this.ExoplanetDiscoveryYrs = function() {
+			runningExopDiscYrs = true;
 			params.futureMillionYrs = 0.;
-			starting = {"value":1990};
-			exopDiscTween = new TWEEN.Tween(starting).to({"value":2017}, 4000);
-			exopDiscTween.onUpdate(function(object){
-				params.pastYrs = object.value;
-				params.updateSSExop()
-			});
-			exopDiscTween.start()
+			params.pastYrs = 1990.;
+
+			params.timeStepUnit = 1.;
+			params.resetSlider('timeStepUnit', basicGUI, params.timeStepUnit);
+			params.timeStepFac = 0.1;
+			params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+
 		}
 		this.FutureSolarSystem = function() {
 			if (!SolarSystemON){
@@ -474,17 +483,17 @@ function defineParams(){
 			//if (MilkyWayON){
 			//	params.ShowHideMilkyWay();
 			//}
-			starting = {"value":0};
-			SSEvolTween = new TWEEN.Tween(starting).to({"value":iLength-1}, 30000);
-			SSEvolTween.onUpdate(function(object){
-				inSSEvolTween = true;
-				params.futureMillionYrs = SunEvol.timeInterp.evaluate(object.value);
-				params.updateSSExop();
-			});
-			SSEvolTween.onComplete(function(){
-				inSSEvolTween = false;
-			});
-			SSEvolTween.start()
+
+			runningFutureSS = true;
+			params.futureMillionYrs = 0.;
+			params.pastYrs = 2017.;
+ 			params.updateSSExop();
+
+			params.timeStepUnit = "equal";
+			params.resetSlider('timeStepUnit', basicGUI, params.timeStepUnit);
+			params.timeStepFac = 1.;
+			params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
+
 		}
 
 //functions
@@ -519,7 +528,7 @@ function defineParams(){
 				}
 				e.material.uniforms.planetAngle.value = planetAngle;
 			});
-			if (exoplanetsON && !exoplanetsInTweening){
+			if ((exoplanetsON) && !exoplanetsInTweening){
 				params.exoplanetMinSize = exoplanetMinSize0*params.exopSize/exopSize0;
 				params.exoplanetMaxSize = exoplanetMaxSize0*params.exopSize/exopSize0;
 
@@ -597,11 +606,26 @@ function defineParams(){
 			makeLegend(params.exopColorMode);
 			params.updateExoplanets();
 		}
+		this.resetSlider = function(name, gui, value){
+			if (gui != null){
+				for(var i = 0; i<gui.__controllers.length;i++){
+					if( gui.__controllers[i].property == name ) {
+						if (Math.sign(value) == -1){
+							gui.__controllers[i].__min = value;
+						} else {
+							gui.__controllers[i].__min = 0.; //NOTE: THIS IS NOT GENERAL, BUT CAN WORK FOR ME HERE
+						}
+						gui.__controllers[i].setValue(value);
+					}
+				}
+			}
+		};
 	};
 
 
 	params = new ParamsInit();
 }
+
 
 function defineGUI(){
 	if (gui != null){
@@ -620,11 +644,18 @@ function defineGUI(){
 
 	if (showSolarSystemEvolGUI){
 		basicGUI.add( params, 'futureMillionYrs', 0, maxTime).listen().onChange( params.updatefutureMillionYrs ).name("Future Million Years");
-		basicGUI.add( params, 'timeStepUnit', { "None": 0, "Year": 1, "Million Years": 1e6, "Equal Solar Mass Loss": -1. } ).name("Time Step Unit");
+		basicGUI.add( params, 'timeStepUnit', { "None": 0, "Year": 1, "Million Years": 1e6, "Equal Solar Mass Loss": "equal" } ).name("Time Step Unit");
 	}
 
 
-	basicGUI.add( params, 'timeStepFac', 0, 100 ).name("Time Step Multiplier");
+	basicGUI.add( params, 'timeStepFac', 0, 100 ).name("Time Step Multiplier");//.listen();
+	//https://stackoverflow.com/questions/41154519/how-to-change-slider-value-on-dat-gui-and-how-to-reset-dat-gui/41154865#41154865	
+	/* Here is the update */
+
+
+
+
+
 	basicGUI.add( params, 'ShowHideSolarSystem').name("Show/Hide Solar System");
 	
 	if (showExoplanetGUI){
@@ -695,12 +726,15 @@ function defineGUI(){
 	SSGUI.add( params, 'coronaAlpha',0., 1. ).onChange( params.updateSolarSystem ).name("Corona Transparency");
 
 	if (showExoplanetGUI){
-		exopGUI.add( params, 'exopSize',0.01, 2. ).onChange( params.updateExoplanets ).name("Exoplanet Size");
+		exopGUI.add( params, 'exopSize',0.01, 10. ).onChange( params.updateExoplanets ).name("Exoplanet Size");
 		exopGUI.add( params, 'exopAlpha',0., 1. ).onChange( params.updateExoplanets ).name("Exoplanet Transparency");
 	}
 
 	MWGUI.add( params, 'MWalpha',0., 1. ).onChange( params.updateMW ).name("Milky Way Transparency");
 
+	if (isMobile){
+		resizeMobile();
+	}
 
 }
 
@@ -715,7 +749,8 @@ function defineTweens(){
 	});
 	exopAlphaTween.onUpdate(function(object){
 		exoplanetsMesh.forEach( function( e, i ) {
-			if ((exoplanets.name[i] != params.GoToExoplanet) || redoExoplanetsTween){
+			//if ( (Math.abs(exoplanets.yrDiscovered[i]) <= params.pastYrs) && ((exoplanets.name[i] != params.GoToExoplanet) || redoExoplanetsTween)){
+			if ( (Math.abs(exoplanets.yrDiscovered[i]) <= params.pastYrs) ){
 				e.material.uniforms.exopAlpha.value = object.value;
 				if (Math.sign(exoplanets.ringInfo[i]) < 0){
 					e.material.uniforms.exopAlpha.value = Math.min(params.exopAlpha, exopDfac/camDist) * object.value;
@@ -831,8 +866,8 @@ function defineTweens(){
 	exoplanetViewTween = new TWEEN.Tween(camera.position).to(exoplanetTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);	
 	exoplanetViewTween.onComplete(function(object){
 		controls.enabled = true;
-		exopAlphaTweenValue.value = params.exopAlpha;
-		exopAlphaTween.to({"value":0.2*parseFloat(params.exopAlpha)}).start();
+		//exopAlphaTweenValue.value = params.exopAlpha;
+		//exopAlphaTween.to({"value":0.2*parseFloat(params.exopAlpha)}).start();
 	});
 
 	KeplerFlyThroughTween = new TWEEN.Tween(camera.position).to(KeplerTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);
@@ -868,6 +903,8 @@ function defineTweens(){
 	});
 	KeplerFlyThroughTween.chain(KeplerFlyThroughTween1);//.chain(KeplerFlyThroughTween2); //I think you can only chain two together
 	KeplerFlyThroughTween2.chain(KeplerFlyThroughTween3);
+
+
 }
 
 function loadData(callback){
@@ -948,7 +985,9 @@ function WebGLStart(){
 //initial GUI
 	gui = new dat.GUI({ width: 450 } )
 	gui.add(params,'splash').name("Home");
-
+	if (isMobile){
+		resizeMobile();
+	}
 
 //draw everything
 	drawInnerMilkyWay();
@@ -957,7 +996,6 @@ function WebGLStart(){
 	drawHZ();
 	drawSun();
 	drawExoplanets();
-
 
 //begin the animation
 	animate();
@@ -972,6 +1010,10 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
     || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4))) isMobile = true;
 
 resizeInstructions();
+if (isMobile){
+	resizeMobile()
+}
+
 window.addEventListener("resize", resizeInstructions);
 d3.select("#instructionsPage1").style("display", "block");
 if (isMobile){
