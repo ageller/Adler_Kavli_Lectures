@@ -3,7 +3,13 @@ function CameraDistance(origin = new THREE.Vector3(0., 0., 0.)){
 	return camera.position.distanceTo(origin);
 }
 
-
+function getAllIndices(arr, val) {
+	var indices = [], i;
+	for(i = 0; i < arr.length; i++)
+		if (arr[i] === val)
+			indices.push(i);
+	return indices;
+}
 //after the data is loaded, include the buttons
 function clearloading(){
 
