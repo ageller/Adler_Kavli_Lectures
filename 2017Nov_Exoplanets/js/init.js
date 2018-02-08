@@ -94,7 +94,12 @@ var exoplanetViewTweenOut;
 var exoplanetViewTweenIn;
 var exoplanetTarget;
 var KeplerFlyThroughTween;
+var KeplerFlyThroughTween2;
+var KeplerFlyThroughTween3;
+var myKeplerRotate;
+var myKeplerRotate2;
 var inSSEvolTween = false;
+var inKeplerFlyThrough = false;
 
 var SunEvol = null;
 var MercuryEvol = null;
@@ -416,12 +421,33 @@ function defineParams(){
 			KeplerViewTween.start();
 		}
 		this.KeplerFlyThrough = function(){
+			if (inKeplerFlyThrough){
+				//console.log("stopping")
+				KeplerFlyThroughTween.stop();
+				KeplerFlyThroughTween1.stop();
+				//KeplerFlyThroughTween2.stop();
+				KeplerFlyThroughTween3.stop();
+				clearInterval(myKeplerRotate);
+				clearInterval(myKeplerRotate2);
+			}
+			inKeplerFlyThrough = true;
 			if (redoExoplanetsTween || !exoplanetsON) params.ShowHideExoplanets();
 			controls.enabled = false;
-			if (camera.position.distanceTo(KeplerTarget) > 1){
-				KeplerFlyThroughTween.start();
-			}else{
+			var dist = camera.position.distanceTo(KeplerTarget);
+			var dsplit1 = 100000.;
+			var dsplit2 = 100000000.;
+			//console.log(dist);
+			if (dist >= dsplit2){
+				//console.log("starting manual")
+				KeplerFlyThroughManual2();
+			} 
+			if (dist >= dsplit1 && dist < dsplit2){
+				//console.log("starting 1")
 				KeplerFlyThroughTween1.start();
+			}
+			if (dist < dsplit1){
+				//console.log("starting 0")
+				KeplerFlyThroughTween.start();
 			}
 		}
 
@@ -742,6 +768,92 @@ function defineGUI(){
 
 }
 
+function KeplerFlyThroughManual(){
+	
+	var Nrot = 100.;
+	var Nrot2 = 100.;
+	var i = 0.;
+	var radius = CameraDistance();
+	//http://mikeheavers.com/tutorials/webgl_circular_camera_rotation_around_a_single_axis_in_threejs/
+	function rotateCamera() {
+		i += 1;
+		var x = camera.position.x;
+		var y = camera.position.y;
+		var z = camera.position.z;
+		var rotSpeed = 0.75 * Math.PI/parseFloat(Nrot);
+		camera.position.x = x * Math.cos(rotSpeed) - z * Math.sin(rotSpeed);
+		camera.position.z = z * Math.cos(rotSpeed) + x * Math.sin(rotSpeed);
+		camera.lookAt( scene.position );
+
+	}
+
+	var dx = 0.
+		dy = 0.
+		dz = 0.;
+	var norm =  (Nrot2 + 1.) / 2.; //sum of i/N from 1 to N
+	function moveToTarget(){
+		i += 1;
+		camera.position.x -= parseFloat(i)/parseFloat(Nrot2)*dx / norm;
+		camera.position.y -= parseFloat(i)/parseFloat(Nrot2)*dy / norm;
+		camera.position.z -= parseFloat(i)/parseFloat(Nrot2)*dz / norm;
+		camera.lookAt( scene.position );
+
+	}
+
+	myKeplerRotate = setInterval(function(){
+		requestAnimationFrame(rotateCamera);
+		if (i > Nrot){
+			clearInterval(myKeplerRotate);
+			i=0.;
+			dx = (camera.position.x - KeplerFlyTarget2.x);
+			dy = (camera.position.y - KeplerFlyTarget2.y);
+			dz = (camera.position.z - KeplerFlyTarget2.z);
+
+			var myKeplerRotate2 = setInterval(function(){
+				requestAnimationFrame(moveToTarget);
+				if (i > Nrot2){
+					clearInterval(myKeplerRotate2);
+					//console.log("starting 0")
+					KeplerFlyThroughTween3.start()
+				}
+
+			}, 1);
+		}
+	}, 1);
+}
+
+function KeplerFlyThroughManual2(){
+	
+	var Nrot = 100.;
+	var Nrot2 = 100.;
+	var i = 0.;
+
+	var dx = (camera.position.x - KeplerFlyTarget2.x);
+	var dy = (camera.position.y - KeplerFlyTarget2.y);
+	var dz = (camera.position.z - KeplerFlyTarget2.z);
+	var norm =  (Nrot2 + 1.) / 2.; //sum of i/N from 1 to N
+	function moveToTarget(){
+		i += 1;
+		camera.position.x -= parseFloat(i)/parseFloat(Nrot2)*dx / norm;
+		camera.position.y -= parseFloat(i)/parseFloat(Nrot2)*dy / norm;
+		camera.position.z -= parseFloat(i)/parseFloat(Nrot2)*dz / norm;
+		camera.lookAt( scene.position );
+
+	}
+
+
+	var myKeplerRotate2 = setInterval(function(){
+		requestAnimationFrame(moveToTarget);
+		if (i > Nrot2){
+			clearInterval(myKeplerRotate2);
+			//console.log("starting 0")
+			KeplerFlyThroughTween3.start()
+		}
+
+	}, 1);
+}
+
+
 function defineTweens(){
 
 	//for easing the alpha on the exoplanets to turn them off
@@ -875,38 +987,20 @@ function defineTweens(){
 	});
 
 	KeplerFlyThroughTween = new TWEEN.Tween(camera.position).to(KeplerTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);
-	KeplerFlyThroughTween1 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget1, 5000).easing(TWEEN.Easing.Quintic.InOut);
-	KeplerFlyThroughTween1.onComplete(function(object){
-		
-		var foo = 0;
-		var Nrot = 50;
-		var myRotate = setInterval(function(){
-			var x = camera.position.x;
-			var y = camera.position.y;
-			var z = camera.position.z;
-			var rotSpeed = 0.75 * Math.PI/Nrot;
-			camera.position.x = x * Math.cos(rotSpeed) - z * Math.sin(rotSpeed);
-			camera.position.z = z * Math.cos(rotSpeed) + x * Math.sin(rotSpeed);
-	  		camera.lookAt(scene.position);
-	  		foo += 1;
-	  		if (foo > Nrot){
-	  			clearInterval(myRotate);
-				KeplerFlyThroughTween2.start()
-	  		}
-	  	}, 1);
-	  	
-
-	});
-	KeplerFlyThroughTween2 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget2, 3000).easing(TWEEN.Easing.Quadratic.Out);
+	KeplerFlyThroughTween1 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget1, 6000).easing(TWEEN.Easing.Quintic.InOut);
+	KeplerFlyThroughTween1.onComplete(function(){ KeplerFlyThroughManual();});
+	//KeplerFlyThroughTween2 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget2, 10000).easing(TWEEN.Easing.Linear.None);
+	//KeplerFLyThroughTween3 now redefined in KeplerFlyThroughManual
 	KeplerFlyThroughTween3 = new TWEEN.Tween(camera.position).to(KeplerTarget, 20000).easing(TWEEN.Easing.Quintic.Out);
 	KeplerFlyThroughTween3.onComplete(function(object){
 		controls.enabled = true;
-		if (SolarSystemON){
-			params.ShowHideSolarSystem()
-		}
+		inKeplerFlyThrough = false;
+		//if (SolarSystemON){
+		//	params.ShowHideSolarSystem()
+		//}
 	});
 	KeplerFlyThroughTween.chain(KeplerFlyThroughTween1);//.chain(KeplerFlyThroughTween2); //I think you can only chain two together
-	KeplerFlyThroughTween2.chain(KeplerFlyThroughTween3);
+	//KeplerFlyThroughTween2.chain(KeplerFlyThroughTween3);
 
 
 }

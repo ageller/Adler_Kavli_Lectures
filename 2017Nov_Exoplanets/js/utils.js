@@ -26,6 +26,17 @@ function clearloading(){
 
 }
 
+function flashplaystop(ID){
+	var pp = d3.select(ID);
+	pp.style("display","block")
+		.style("opacity",1.);
+	pp.transition()
+		.ease(d3.easeLinear)
+		.duration(500)
+		.style("opacity", 0.)
+		.on("end", function() { pp.style("display","none") });
+}
+
 function resizeMobile(){
 	d3.selectAll(".instructionsTitle").style("font-size", "72px"); 
 	d3.selectAll(".instructionsSubTitle").style("font-size", "60px"); 
@@ -64,6 +75,7 @@ function resizeInstructions(){
     d3.select('#instructionsDiv').style("height",height - 40. + 'px');
     d3.select('#instructionsDiv').style("visibility","visible");
 
+
     if (height < 500){
 		d3.selectAll("#credits").style("position","relative");
     } else {
@@ -94,6 +106,7 @@ function resizeInstructions(){
 
 	d3.selectAll(".myInstructions").style("width", wd-80 + 'px');
 }
+
 
 
 function hideButtons(){

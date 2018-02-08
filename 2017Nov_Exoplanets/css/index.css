@@ -15,7 +15,25 @@ a:visited{
     color: #FFF008;
 } 
 
-
+.playstop{
+    position:absolute;
+    top:50%;
+    left:50%;
+    height:200px;
+    width: 200px;
+    padding: 0px;
+    margin: 0px;
+    margin-left:-100px;
+    margin-top:-100px;
+	z-index: 4;
+	color: #FFF008;
+	background-color:none;
+	text-align: center;
+	border: 2px solid #FFF008;
+	border-radius: 5%;
+	opacity: 0.0;
+	display: none;
+}
 
 #splash{
 	position:absolute; 

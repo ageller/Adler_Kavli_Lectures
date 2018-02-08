@@ -9,6 +9,10 @@ function animate(time) {
 function update(time){
 	keyboard.update();
 
+	if (params.timeStepFac > 0){
+		params.pause = false;
+	}
+
 	if ( keyboard.down("Q") ) {
         splashMessage=!splashMessage;
         if (splashMessage){
@@ -23,10 +27,27 @@ function update(time){
 	if ( keyboard.down("space") ) {
 		params.pause = !params.pause;
 		if (params.pause){
-			params.saveTimeStepFac = params.timeStepFac;
-			params.timeStepFac = 0.;
+			if (params.timeStepFac > 0 && params.timeStepUnit != 0){
+				params.saveTimeStepFac = params.timeStepFac;
+				flashplaystop("#stop");
+				params.timeStepFac = 0.;
+			}
+			if (inKeplerFlyThrough){
+				inKeplerFlyThrough = false;
+				controls.enabled = true;
+				flashplaystop("#stop");
+				KeplerFlyThroughTween.stop();
+				KeplerFlyThroughTween1.stop();
+				//KeplerFlyThroughTween2.stop();
+				KeplerFlyThroughTween3.stop();
+				clearInterval(myKeplerRotate);
+				clearInterval(myKeplerRotate2);
+			}
 		} else {
-			params.timeStepFac = params.saveTimeStepFac;
+			if (params.timeStepFac == 0 && params.timeStepUnit != 0){
+				flashplaystop("#play")
+				params.timeStepFac = params.saveTimeStepFac;
+			}
 		}
 		params.resetSlider('timeStepFac', basicGUI, params.timeStepFac);
 
