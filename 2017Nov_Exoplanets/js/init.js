@@ -826,7 +826,7 @@ function KeplerFlyThroughManual(){
 			dy = (camera.position.y - KeplerFlyTarget2.y);
 			dz = (camera.position.z - KeplerFlyTarget2.z);
 
-			var myKeplerRotate2 = setInterval(function(){
+			myKeplerRotate2 = setInterval(function(){
 				requestAnimationFrame(moveToTarget);
 				if (i > Nrot2){
 					clearInterval(myKeplerRotate2);
@@ -859,7 +859,7 @@ function KeplerFlyThroughManual2(){
 	}
 
 
-	var myKeplerRotate2 = setInterval(function(){
+	myKeplerRotate2 = setInterval(function(){
 		requestAnimationFrame(moveToTarget);
 		if (i > Nrot2){
 			clearInterval(myKeplerRotate2);
