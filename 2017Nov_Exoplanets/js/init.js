@@ -14,6 +14,8 @@ var JD0 = 2447892.5; //Jan. 1, 1990
 
 var AUfac = 206264.94195722;
 
+var showingexott = false;
+
 var orbitLines = [];
 var SunMesh;
 var coronaMesh;
@@ -31,7 +33,10 @@ var exopDfac = 100.; //distance from camera when we should start fading out exop
 var uExoplanets;
 var redoExoplanetsTween = false;
 
-var SSrotation = new THREE.Vector3(THREE.Math.degToRad(63.), 0., -Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
+//var SSrotation = new THREE.Vector3(THREE.Math.degToRad(-63.), Math.PI, Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
+var SSrotation = new THREE.Vector3(THREE.Math.degToRad(-63.), 0., 0.); //solar system is inclined at 63 degrees to galactic plane
+
+//var SSrotation = new THREE.Vector3(THREE.Math.degToRad(-63.), 0., Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
 
 var maxHZa = 0.;
 var maxTime = 0.;
@@ -120,6 +125,11 @@ var showSolarSystemEvolGUI = false;
 
 var splashMessage = true;
 var instructionIndex = 1;
+var showTooltips = false;
+var exoName;
+var exoPos;
+var exoIndex;
+var screenXYcheck;
 
 function init() {
 	// scene
@@ -182,7 +192,8 @@ function init() {
 	//Milky Way illustration: https://commons.wikimedia.org/wiki/File:Milky_Way_Galaxy.jpg
 	MWTex = new THREE.TextureLoader().load("textures/2048px-Milky_Way_Galaxy.png");
 	MWTex.minFilter = THREE.LinearFilter;
-
+	MWTex.flipY = false;
+	
 	//ESO equirectangle MW texture: https://www.eso.org/public/usa/images/eso0932a/
 	ESOMWTex = new THREE.TextureLoader().load("textures/eso0932a.jpg" );
 	ESOMWTex.minFilter = THREE.LinearFilter;
@@ -481,6 +492,11 @@ function defineParams(){
 
 				//console.log(pos, exoplanetTarget, c0, r, r1, val, matrix)
 				exoplanetViewTween.to(exoplanetTarget, 3500);
+				exoplanetViewTween.onComplete(function(object){
+					controls.enabled = true;
+					var screenPos = screenXY(pos);
+					showExoTooltip(null, pageX = screenPos.x, pageY = screenPos.y);
+				});
 				exoplanetViewTween.start();
 				exoplanetsMesh[imesh].material.uniforms.exopAlpha.value = 1.;
 
@@ -529,6 +545,7 @@ function defineParams(){
     		controls.update();
         }
         this.updateZoom = function() {
+    var pageY = e.pageY;params.zoomSpeed;
     		controls.zoomSpeed = params.zoomSpeed;
     		controls.update();
         }
@@ -980,11 +997,12 @@ function defineTweens(){
 	//dummy values will be reset in params
 	var exoplanetTarget = new THREE.Vector3(0,0,0);
 	exoplanetViewTween = new TWEEN.Tween(camera.position).to(exoplanetTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);	
-	exoplanetViewTween.onComplete(function(object){
-		controls.enabled = true;
-		//exopAlphaTweenValue.value = params.exopAlpha;
-		//exopAlphaTween.to({"value":0.2*parseFloat(params.exopAlpha)}).start();
-	});
+	// now defined above
+	// exoplanetViewTween.onComplete(function(object){
+	// 	controls.enabled = true;
+	// 	//exopAlphaTweenValue.value = params.exopAlpha;
+	// 	//exopAlphaTween.to({"value":0.2*parseFloat(params.exopAlpha)}).start();
+	// });
 
 	KeplerFlyThroughTween = new TWEEN.Tween(camera.position).to(KeplerTarget, 3000).easing(TWEEN.Easing.Quintic.InOut);
 	KeplerFlyThroughTween1 = new TWEEN.Tween(camera.position).to(KeplerFlyTarget1, 6000).easing(TWEEN.Easing.Quintic.InOut);
@@ -1113,6 +1131,7 @@ if (isMobile){
 }
 
 window.addEventListener("resize", resizeInstructions);
+
 d3.select("#instructionsPage1").style("display", "block");
 if (isMobile){
 	d3.select("#instructionsDiv")

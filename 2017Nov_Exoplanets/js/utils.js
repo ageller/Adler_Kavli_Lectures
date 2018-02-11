@@ -26,6 +26,151 @@ function clearloading(){
 
 }
 
+//for the exoplanet tooltip
+function attachTooltips(){
+	document.addEventListener("dblclick", showExoTooltip);
+	//document.addEventListener("mousemove", moveExoTooltip, false);
+	//window.addEventListener("mousemove", moveExoTooltip);
+}
+function removeTooltips(){
+	document.removeEventListener("dblclick", showExoTooltip);
+	//document.removeEventListener("mousemove", moveExoTooltip);
+	//window.removeEventListener("mousemove", moveExoTooltip);
+}
+
+function getExoName(pageX, pageY, tt){
+	tt.html('<span class="loader__dot">.</span><span class="loader__dot">.</span><span class="loader__dot">.</span>');
+
+	var mpos = new THREE.Vector3(pageX,pageY, 0)
+	exoPos = new THREE.Vector3(0,0, 0)
+	var dist = 1e100;
+	exoName = '';
+	exoIndex = -1;
+	var pos;
+	uExoplanets.position.forEach(function(p,i){
+		//console.log(p)
+		pos = screenXY(p)
+		var tdist = mpos.distanceTo(pos); //need to add on depth?
+		if (tdist < dist){ 
+			dist = tdist
+			exoName = uExoplanets.name[i];
+			exoPos = pos; 
+			exoIndex = i;
+			//console.log(name, dist)
+
+		}
+	});
+
+	var link = uExoplanets.URL[exoIndex];
+
+	tt.html('<a href=' + link + ' target="_blank" style="opacity:1">' + exoName + "</a>");
+	//tt.html('<span style="opacity:1">' + exoName + "</span>");
+	//tt.append('span').style("opacity","1.").text(name);
+
+	var et = d3.select("#exoTooltip")
+	et.style("top",exoPos.y - parseFloat(et.style("height")) - 2.*parseFloat(et.style("padding")))
+	et.style("left", exoPos.x- parseFloat(et.style("width")) - 2.*parseFloat(et.style("padding")));
+
+	var ec = d3.select("#exoCircle")
+	ec.style("top",exoPos.y - parseFloat(ec.style("height"))/2.)
+	ec.style("left", exoPos.x - parseFloat(ec.style("width"))/2.);	
+
+	fadeExoTooltip();
+}
+
+function showExoTooltip(e, pageX = null, pageY = null){
+	d3.selectAll(".tooltipFade").interrupt();
+
+	showingexott = true;
+	if (pageX == null) pageX = e.pageX;
+    if (pageY == null) pageY = e.pageY;
+
+	tt = d3.select("#exoTooltip")
+	tt.style("display","block").style("opacity", 1.);
+
+	d3.select("#exoCircle").style("display","block").style("opacity", 1.);
+
+	getExoName(pageX, pageY, tt);
+}
+function fadeExoTooltip(){
+	//dim away and remove
+	tt = d3.selectAll(".tooltipFade");
+	tt.transition()
+	    .delay(5000)
+		.ease(d3.easeLinear)
+		.duration(1000)
+		.style("opacity", 0.)
+		.on("end", function() { 
+			tt.style("display","none");
+			showingexott = false; 
+		});
+
+}
+function moveExoTooltip(){
+
+	var pos = screenXY(uExoplanets.position[exoIndex]);
+	if (screenXYcheck){
+		var et = d3.select("#exoTooltip")
+		et.style("top",pos.y - parseFloat(et.style("height")) - 2.*parseFloat(et.style("padding")))
+		et.style("left", pos.x- parseFloat(et.style("width")) - 2.*parseFloat(et.style("padding")));
+
+		var ec = d3.select("#exoCircle")
+		ec.style("top",pos.y - parseFloat(ec.style("height"))/2.)
+		ec.style("left", pos.x - parseFloat(ec.style("width"))/2.);	
+	}
+
+}
+
+//could use these to move the label around with mouse movements
+// function showHideExoTooltip(e){
+// 	if (showingexott){
+// 		hideExotooltip(e);
+// 	} else {
+// 		showExotooltip(e);
+// 	}
+// }
+// function hideExoTooltip(e){
+// 	showingexott = false;
+// 	d3.select("#exotooltip").style("display","none");
+// 	d3.select("#exoCircle").style("display","none")
+// }
+// function moveExoTooltip(e){
+// 	var pageX = e.pageX;
+// 	var pageY = e.pageY;
+
+// 	// var et = d3.select("#exotooltip")
+// 	// et.style("top",pageY - parseFloat(et.style("height")))
+// 	// 	.style("left", pageX - parseFloat(et.style("width")));
+
+// 	if (showingexott){
+// 		getExoName(pageX, pageY, tt)
+// 	}
+// }
+
+
+function screenXY(obj){
+
+	var vector = obj.clone();
+	var windowWidth = window.innerWidth;
+	var windowHeight = window.innerHeight;
+	var widthHalf = (windowWidth/2);
+	var heightHalf = (window.innerHeight/2);
+
+	vector.project(camera);
+
+	vector.x = ( vector.x * widthHalf ) + widthHalf;
+	vector.y = - ( vector.y * heightHalf ) + heightHalf;
+
+	screenXYcheck = true;
+	if (vector.z > 1){
+		screenXYcheck = false;
+	}
+
+	vector.z = 0;
+
+	return vector;
+}
+
 function flashplaystop(ID){
 	var pp = d3.select(ID);
 	pp.style("display","block")
@@ -183,6 +328,8 @@ function showExop(){
 
 	showExoplanetGUI = true; 
 	showSolarSystemEvolGUI = false; 
+	showTooltips = true;
+
 	defineGUI(); 
 	if (!exoplanetsON){
 		params.ShowHideExoplanets()
@@ -201,6 +348,8 @@ function showSSEvol(){
 
 	showExoplanetGUI = false; 
 	showSolarSystemEvolGUI = true; 
+	showTooltips = false;
+
 	defineGUI(); 
 	if (exoplanetsON){
 		params.ShowHideExoplanets()
@@ -219,6 +368,8 @@ function showFree(){
 
 	showExoplanetGUI = false; 
 	showSolarSystemEvolGUI = false; 
+	showTooltips = true;
+
 	if (gui != null){
 		gui.destroy();
 	}
@@ -257,6 +408,11 @@ function hideSplash(id){
         .on("end", function(d){
             splash.style("display","none");
         })
+
+	removeTooltips();
+    if (showTooltips){
+    	attachTooltips();
+    }
 }
 //show the splash screen
 function showSplash(id, op = 0.8){

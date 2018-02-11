@@ -15,13 +15,14 @@ function getUniqExoplanets(){
 	var uNames = exoplanets.name.filter(function(item, pos){
 	  return exoplanets.name.indexOf(item) == pos; 
 	});
-
 	uPos = [];
+	uLink = [];
 	uNames.forEach(function(item,pos){
 		var i = exoplanets.name.indexOf(item)
 		uPos.push(new THREE.Vector3(exoplanets.x[i]*AUfac, exoplanets.y[i]*AUfac, exoplanets.z[i]*AUfac))
+		uLink.push(exoplanets.URL[i])
 	})
-	uExoplanets = {"name":uNames, "position":uPos};
+	uExoplanets = {"name":uNames, "position":uPos, "URL":uLink};
 }
 
 function drawExoplanets()

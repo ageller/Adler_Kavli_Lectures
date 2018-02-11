@@ -35,6 +35,34 @@ a:visited{
 	display: none;
 }
 
+.overCircle{
+	position:absolute;
+	height:20px;
+	width: 20px;
+	padding: 0px;
+	margin: 0px;
+	z-index: 5;
+	background-color: #FFF008;
+	text-align: center;
+	border-radius: 50%;
+	/*opacity: 0.0;
+	display: none;*/
+}
+.tooltip{
+	position:absolute;
+	height:auto;
+	width: auto;
+	padding: 10px;
+	margin: 0px;
+	z-index: 4;
+	color: white;
+	background-color: rgba(0,0,0,0.5);
+	text-align: center;
+	border: 2px solid #FFF008;
+	border-radius: 10%;
+	/*opacity: 0.0;
+	display: none;*/
+}
 #splash{
 	position:absolute; 
 	top:0; 

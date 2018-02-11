@@ -34,7 +34,7 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 		r = radius/Math.log(B * Math.tan(angle/(2.*N)));
 		if (Math.abs(r) < radmax){
 			x = r * Math.cos(angle) + Math.random() * armThickness;
-			y = r * Math.sin(angle) + Math.random() * armThickness;
+			y = -r * Math.sin(angle) + Math.random() * armThickness;
 			z = (Math.random() - 0.5) * scaleHeight;
 
 			vect = new THREE.Vector3(x, y, z);
@@ -43,7 +43,7 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 			galaxy.vertices.push(vect);
 
 			x = -r * Math.cos(angle) + Math.random() * armThickness;
-			y = -r * Math.sin(angle) + Math.random() * armThickness;
+			y = r * Math.sin(angle) + Math.random() * armThickness;
 			z = -1.*((Math.random() - 0.5) * scaleHeight);
 
 			vect = new THREE.Vector3(x, y, z);
@@ -61,7 +61,7 @@ function createSpiralGalaxy(arms, starsPerArm, radius, scaleHeight, armThickness
 
 		r = smallR * (2.*i/Nbar - 1.);
 		x = r + Math.random() * armThickness;
-		y = Math.random() * armThickness;
+		y = -Math.random() * armThickness;
 		z = (Math.random() - 0.5) * scaleHeight;
 
 			vect = new THREE.Vector3(x, y, z);
@@ -88,7 +88,7 @@ function drawMilkyWay()
 	var N = 15.; //winding tightness
 	var B = 2.5; //bulge-to-arm size
 	var fac3 = 20.;
-	var armsRot = -Math.PI/8.;
+	var armsRot = Math.PI/8.;
 	var barRad = 2.*radius; //to make the inner part more yellow
 
 	var Ssize = 0.5; //size of star points
@@ -187,6 +187,7 @@ function drawMilkyWay()
 	} );
 	MWTexmesh = new THREE.Mesh( geometry, MWMaterial );
 	MWTexmesh.position.set(center.x, center.y, center.z);
+
 
 
 	MilkyWayMesh.push(mesh1);

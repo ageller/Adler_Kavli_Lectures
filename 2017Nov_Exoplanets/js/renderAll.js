@@ -65,6 +65,11 @@ function update(time){
 	controls.update();
 	TWEEN.update(time);
 	SunMesh.material.uniforms.cameraCenter.value = camera.position;
+
+	//probably a more efficient way to do this only when camera changes, but this appears to work without slowing things down
+	if (showingexott){
+		moveExoTooltip();
+	}
 }
 
 function updateBillboards(){
