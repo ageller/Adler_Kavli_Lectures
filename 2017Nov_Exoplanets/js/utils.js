@@ -29,13 +29,9 @@ function clearloading(){
 //for the exoplanet tooltip
 function attachTooltips(){
 	document.addEventListener("dblclick", showExoTooltip);
-	//document.addEventListener("mousemove", moveExoTooltip, false);
-	//window.addEventListener("mousemove", moveExoTooltip);
 }
 function removeTooltips(){
 	document.removeEventListener("dblclick", showExoTooltip);
-	//document.removeEventListener("mousemove", moveExoTooltip);
-	//window.removeEventListener("mousemove", moveExoTooltip);
 }
 
 function getExoName(pageX, pageY, tt){
@@ -64,16 +60,8 @@ function getExoName(pageX, pageY, tt){
 	var link = uExoplanets.URL[exoIndex];
 
 	tt.html('<a href=' + link + ' target="_blank" style="opacity:1">' + exoName + "</a>");
-	//tt.html('<span style="opacity:1">' + exoName + "</span>");
-	//tt.append('span').style("opacity","1.").text(name);
 
-	var et = d3.select("#exoTooltip")
-	et.style("top",exoPos.y - parseFloat(et.style("height")) - 2.*parseFloat(et.style("padding")))
-	et.style("left", exoPos.x- parseFloat(et.style("width")) - 2.*parseFloat(et.style("padding")));
-
-	var ec = d3.select("#exoCircle")
-	ec.style("top",exoPos.y - parseFloat(ec.style("height"))/2.)
-	ec.style("left", exoPos.x - parseFloat(ec.style("width"))/2.);	
+	moveExoTooltip(pos = exoPos);
 
 	fadeExoTooltip();
 }
@@ -106,13 +94,15 @@ function fadeExoTooltip(){
 		});
 
 }
-function moveExoTooltip(){
+function moveExoTooltip(pos = null){
 
-	var pos = screenXY(uExoplanets.position[exoIndex]);
+	if (pos == null){
+		pos = screenXY(uExoplanets.position[exoIndex]);
+	}
 	if (screenXYcheck){
 		var et = d3.select("#exoTooltip")
-		et.style("top",pos.y - parseFloat(et.style("height")) - 2.*parseFloat(et.style("padding")))
-		et.style("left", pos.x- parseFloat(et.style("width")) - 2.*parseFloat(et.style("padding")));
+		et.style("top",pos.y )
+		et.style("left", pos.x );
 
 		var ec = d3.select("#exoCircle")
 		ec.style("top",pos.y - parseFloat(ec.style("height"))/2.)
@@ -120,33 +110,6 @@ function moveExoTooltip(){
 	}
 
 }
-
-//could use these to move the label around with mouse movements
-// function showHideExoTooltip(e){
-// 	if (showingexott){
-// 		hideExotooltip(e);
-// 	} else {
-// 		showExotooltip(e);
-// 	}
-// }
-// function hideExoTooltip(e){
-// 	showingexott = false;
-// 	d3.select("#exotooltip").style("display","none");
-// 	d3.select("#exoCircle").style("display","none")
-// }
-// function moveExoTooltip(e){
-// 	var pageX = e.pageX;
-// 	var pageY = e.pageY;
-
-// 	// var et = d3.select("#exotooltip")
-// 	// et.style("top",pageY - parseFloat(et.style("height")))
-// 	// 	.style("left", pageX - parseFloat(et.style("width")));
-
-// 	if (showingexott){
-// 		getExoName(pageX, pageY, tt)
-// 	}
-// }
-
 
 function screenXY(obj){
 

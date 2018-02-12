@@ -33,10 +33,8 @@ var exopDfac = 100.; //distance from camera when we should start fading out exop
 var uExoplanets;
 var redoExoplanetsTween = false;
 
-//var SSrotation = new THREE.Vector3(THREE.Math.degToRad(-63.), Math.PI, Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
 var SSrotation = new THREE.Vector3(THREE.Math.degToRad(-63.), 0., 0.); //solar system is inclined at 63 degrees to galactic plane
 
-//var SSrotation = new THREE.Vector3(THREE.Math.degToRad(-63.), 0., Math.PI/2.); //solar system is inclined at 63 degrees to galactic plane
 
 var maxHZa = 0.;
 var maxTime = 0.;
