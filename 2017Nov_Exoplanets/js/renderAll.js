@@ -27,7 +27,7 @@ function update(time){
 	if ( keyboard.down("space") ) {
 		params.pause = !params.pause;
 		if (params.pause){
-			if (params.timeStepFac > 0 && params.timeStepUnit != 0){
+			if (params.timeStepFac != 0 && params.timeStepUnit != 0){
 				params.saveTimeStepFac = params.timeStepFac;
 				flashplaystop("#stop");
 				params.timeStepFac = 0.;
