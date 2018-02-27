@@ -137,6 +137,7 @@ function render() {
 
 
 	//I want to set a minimum and maximum size for the exoplanets
+	var eScale;
 	if (exoplanetsON && !exoplanetsInTweening){
 		exoplanetsMesh.forEach( function(l, i){
 			if (exoplanets.name[i] != params.GoToExoplanet && Math.abs(exoplanets.yrDiscovered[i]) <= params.pastYrs){
@@ -145,17 +146,16 @@ function render() {
 				vFOV = THREE.Math.degToRad( camera.fov ); // convert vertical fov to radians
 				height = 2 * Math.tan( vFOV / 2 ) * dist; // visible height
 				width = height * camera.aspect; 
+				eScale = 1.;
 				if (l.material.uniforms.size.value/width < params.exoplanetMinSize){
-					l.scale.x = params.exoplanetMinSize * width / l.material.uniforms.size.value;
-					l.scale.y = params.exoplanetMinSize * width / l.material.uniforms.size.value;
-					//l.material.uniforms.size.value = exoplanetMinSize * width;
-
+					eScale = params.exoplanetMinSize * width / l.material.uniforms.size.value;
 				} 	
 				if (l.material.uniforms.size.value/width > params.exoplanetMaxSize){
-					l.scale.x = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
-					l.scale.y = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
-					//l.material.uniforms.size.value = exoplanetMinSize * width;
+					eScale = params.exoplanetMaxSize * width / l.material.uniforms.size.value;
 				} 	
+				l.scale.x = eScale;
+				l.scale.y = eScale;
+				l.material.uniforms.eScale.value = THREE.Math.clamp(eScale, 1., 4.);
 				//also if we pull far enough away from the Sun, fade out planets without known distances
 				//if there is no distance known, the ringInfo will be negative
 				if (Math.sign(exoplanets.ringInfo[i]) < 0){

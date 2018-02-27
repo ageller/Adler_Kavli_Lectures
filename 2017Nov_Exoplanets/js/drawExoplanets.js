@@ -58,6 +58,7 @@ function drawExoplanets()
 				ringTot: {value: ringTot},
 				ringNum: {value: ringNum},
 				size: {value: gSize},
+				eScale: {value: 1.},
 				colorMode: {value: params.exopColorMode},
 				markerMode: {value: params.exopMarkerMode},
 				afac: {value: exoplanets.afac[i]},

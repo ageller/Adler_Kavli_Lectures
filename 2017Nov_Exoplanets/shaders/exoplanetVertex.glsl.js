@@ -1,6 +1,7 @@
 var exoplanetVertexShader = `
 
 varying vec3 vPosition;
+
 uniform float size;
 
 void main()

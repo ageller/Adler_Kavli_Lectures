@@ -400,7 +400,7 @@ function defineParams(){
 			}
 		};
 //Galaxy controls
-		this.MWalpha = 0.7;
+		this.MWalpha = 0.5;
 		this.ShowHideMilkyWay = function() {
 			checkController = getController(basicGUI, params, "ShowHideMilkyWay");
 			if (checkController != null){

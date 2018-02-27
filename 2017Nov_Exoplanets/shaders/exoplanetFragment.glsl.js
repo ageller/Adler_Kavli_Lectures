@@ -14,6 +14,8 @@ uniform float ringTot;
 uniform float afac;
 uniform float planetAngle;
 uniform float exopAlpha;
+uniform float eScale;
+
 uniform int habitable;
 
 void main()
@@ -105,13 +107,13 @@ void main()
 	}
 	if (markerMode == 2){ //orrery
 		float drawStart = 0.35;
-		float drawWidth = 0.01;//0.03;
+		float drawWidth = 0.01 * eScale ;//0.03;
 		float dS = drawStart*afac ;
 		vec4 color = vec4(vec3(0.5),0.0);
 		if (r < (dS+drawWidth) && r > (dS-drawWidth)){
 			color.a = 1.;
 			if (colorMode == 3){
-				color.rgb = markerColor.rgb + 0.1;
+                color.rgb = markerColor.rgb + 0.1;
 			}
 		}
 		//if (r > dS && r < (dS+drawWidth)){
