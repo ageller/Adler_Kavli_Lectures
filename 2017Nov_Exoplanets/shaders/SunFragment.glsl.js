@@ -94,7 +94,9 @@ void main()
     float Rstar2 = 1.0;
     float r2 = dist/radius * dist/radius;
     brightness = (1. - u*(1. - sqrt((Rstar2 - r2)/Rstar2)));
-
+    if (r2 > Rstar2){
+        discard;
+    }
 	float cameraDistance = clamp(length(cameraPosition)/10., 1., 100.);
 
 	vec3 cNorm = normalize(cameraPosition);
